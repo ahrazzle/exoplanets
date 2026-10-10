@@ -525,6 +525,12 @@ rejected by hand.
 - **Known planets.** TOI-700 b and c, and L 98-59 b, c and d are recovered
   ([`validation/`](validation/)). With the TOIs masked, the TOI-host search recovers TOI-4342's
   18.9 d signal and the community candidate L 98-59 .04 (CTOI, 1.05 d).
+- **TOIs in our light curves.** Before masking a host's TOIs, the TOI-host search refits each one
+  at its catalogue period: 6,258 of the 6,321 TOIs with periods up to 30 d and at least two cycles in
+  the data (99.0%; 99.7% of the confirmed planets) are detected at SNR ≥ 7. That includes 84 of the 87
+  TOIs on the hosts of the 70 TESS planets the NASA Exoplanet Archive added on 8 October 2026; the
+  other three have periods of 754 and 1,637 d or a single transit. This is a check at known periods;
+  blind recovery is measured by the control systems above and the injections below.
 - **Injection–recovery.** Transits injected at a nominal SNR of 10 into 300 random targets
   ([`validation/injection_recovery_snr10_n300.csv`](validation/injection_recovery_snr10_n300.csv)):
 
