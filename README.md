@@ -155,11 +155,19 @@ Two more searches found 8 signals that pass every check: 6 for which we found no
 | 351339274 | 4.225136 | 0.75 | 3529 K, 9.2, 13 pc | – | TCE re-check; GJ 774 A; its companion GJ 774 B, 17.6" away and 1.2 mag fainter, could be the host instead (0.75 R⊕ on A, about 0.9 R⊕ on B) |
 | 257484419 | 4.353306 | 2.45 | 4184 K, 11.2, 81 pc | – | TCE re-check; second signal on the star of our 18.06 d update candidate; reported on 3 October by Ozturk (Zenodo 23118499) |
 | 124573851 | 9.529248 | 2.48 | 5625 K, 10.2, 143 pc | TOI-669.01 (CP, 3.94 d) | TCE re-check; second signal on TOI-669; matches a weak radial-velocity signal at 9.61 ± 0.52 d (Akana Murphy et al. 2023); confirmed: TOI-669 b |
-| 39516274 | 14.216035 | 1.36 | 4674 K, 9.3, 46 pc | TOI-5997.01 (CP, 5.66 d) | TCE re-check; HIP 85850; second signal on TOI-5997 |
+| 39516274 | 14.216035 | 1.36 | 4674 K, 9.3, 46 pc | TOI-5997.01 (CP, 5.66 d) | TCE re-check; HIP 85850; second signal on TOI-5997, whose planet b the NASA Exoplanet Archive added on 8 October 2026, so this would be TOI-5997 c. Samson Fraser posted the same signal on Zenodo on 9 October ([10.5281/zenodo.23249265](https://doi.org/10.5281/zenodo.23249265)), the day after this update |
 | 269728501 | 50.319649 | 2.98 | 4443 K, 11.6, 119 pc | TOI-4566.01 (PC, 2.08 d) | 20-100 d; second signal on TOI-4566 (see below) |
 
 **TIC 269728501 (TOI-4566), 50.32 d.** Six transits in 17 sectors. SPOC's Sectors 1–96 search
 listed two of them as a 754.8 d TCE, 15 times this period.
+
+**GJ 237 (TIC 293689266), 29.29 d: not counted.** The TCE re-check also found this signal, and it
+passes every LEO-Vetter test (MES 12), but the star is half of a pair of early M dwarfs 3.7″ apart that
+the difference images cannot separate. TRICERATOPS makes it almost certainly a planet (eclipsing-binary
+scenarios < 0.1%) but cannot tell which star it orbits: 50% the primary, 36% the companion (FPP 0.48,
+NFPP 0.54), so it fails the NFPP < 0.1 bar we apply to signals with a close neighbour. Samson Fraser
+listed it as a candidate on Zenodo on 9 October
+([10.5281/zenodo.23249265](https://doi.org/10.5281/zenodo.23249265)), with the same host ambiguity.
 
 **TIC 235005571, 1.33 d: rejected.** It passed every automated check, but
 [an RNAAS note](https://ui.adsabs.harvard.edu/abs/2026RNAAS..10..220R) shows the star is an
