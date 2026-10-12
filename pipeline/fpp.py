@@ -6,6 +6,9 @@ estimate that scatters by tens of percent between runs (TIC 61816225: 0.012-0.06
 runs), so several runs are averaged and their spread is reported.
 The Gaia field-star query is the slow part of the setup (~4 min); its result is cached next to
 the fold file and reused.
+With --molusc, the same number of runs is repeated with TRICERATOPS's bound companions drawn from the
+MOLUSC survivors (molusc_batch.py) and without the scenarios in --drop (e.g. EB,EBx2P where Gaia RVs
+exclude a stellar companion eclipsing the target); these are reported as FPP_m and NFPP_m.
 """
 import argparse
 import contextlib
@@ -27,6 +30,8 @@ ap.add_argument("--cc-filt", default="TESS")
 ap.add_argument("--tag", default="")
 ap.add_argument("--cutouts", help="directory of FFI cutouts tess-sSSSS-*.fits (from s3cut.py) to use instead of TESScut")
 ap.add_argument("--gaia-vizier", action="store_true", help="query the Gaia DR3 field stars at VizieR instead of the ESA archive")
+ap.add_argument("--molusc", help="MOLUSC survivors (_kept.csv) for a second set of runs with Gaia companion limits")
+ap.add_argument("--drop", default="", help="comma-separated scenarios to drop in the --molusc runs")
 ap.add_argument("--nearby-max-arcsec", type=float,
                 help="evaluate nearby-star scenarios only for neighbours within this separation (centroid-excluded beyond)")
 a = ap.parse_args()
@@ -110,19 +115,58 @@ if a.nearby_max_arcsec:
     print(f"{int((far & (target.stars['tdepth'] > 0)).sum())} capable neighbours beyond {a.nearby_max_arcsec}\" dropped")
     target.stars.loc[far, "tdepth"] = 0.0
 print(target.stars[["ID", "Tmag", "sep (arcsec)", "fluxratio", "tdepth"]].head(8).to_string())
-fpps, nfpps = [], []
-for r in range(a.runs):
-    # parallel=True evaluates all draws in one vectorised PyTransit call; it needs a scalar
-    # flux_err_0 (an array raises a broadcasting error)
-    target.calc_probs(time=d["time"], flux_0=d["flux"], flux_err_0=float(np.median(d["flux_err"])),
-                      P_orb=float(d["P"]), N=a.draws, parallel=True, verbose=0, exptime=10 / 1440,
-                      contrast_curve_file=a.cc, filt=a.cc_filt)
-    fpps.append(target.FPP); nfpps.append(target.NFPP)
-    print(f"run {r}: FPP={target.FPP:.4f} NFPP={target.NFPP:.2e}", flush=True)
-print(target.probs.sort_values("prob", ascending=False).head(6).to_string())
+
+
+def runs(molusc_file=None, drop=()):
+    fpps, nfpps = [], []
+    for r in range(a.runs):
+        # parallel=True evaluates all draws in one vectorised PyTransit call; it needs a scalar
+        # flux_err_0 (an array raises a broadcasting error)
+        target.calc_probs(time=d["time"], flux_0=d["flux"], flux_err_0=float(np.median(d["flux_err"])),
+                          P_orb=float(d["P"]), N=a.draws, parallel=True, verbose=0, exptime=10 / 1440,
+                          contrast_curve_file=a.cc, filt=a.cc_filt, molusc_file=molusc_file, drop_scenario=list(drop))
+        fpps.append(target.FPP); nfpps.append(target.NFPP)
+        print(f"run {r}{' (MOLUSC)' if molusc_file else ''}: FPP={target.FPP:.4f} NFPP={target.NFPP:.2e}", flush=True)
+    print(target.probs.sort_values("prob", ascending=False).head(6).to_string())
+    return fpps, nfpps
+
+
+fpps, nfpps = runs()
 res = dict(tic=a.tic, FPP_mean=float(np.mean(fpps)), FPP_sd=float(np.std(fpps, ddof=1)) if len(fpps) > 1 else None,
            FPP_sem=float(np.std(fpps, ddof=1) / np.sqrt(len(fpps))) if len(fpps) > 1 else None,
            FPP=fpps, NFPP_max=float(np.max(nfpps)), runs=a.runs, draws=a.draws)
+out = a.fold.replace(".npz", f"_fpp{a.tag}.json")
+with open(out, "w") as fh:            # written now so the default runs survive a failure in the MOLUSC runs
+    json.dump(res, fh)
+if a.molusc:
+    import types
+
+    import pandas as pd
+    import triceratops.marginal_likelihoods as ml
+
+    class _Columns:
+        """What TRICERATOPS reads the MOLUSC file into: it indexes columns, filters rows with a boolean mask and
+        writes into the mass-ratio array, which pandas 3 (copy-on-write) returns read-only; these copies are writable."""
+        def __init__(self, cols):
+            self.cols = cols
+
+        def __getitem__(self, key):
+            if isinstance(key, str):
+                return types.SimpleNamespace(values=self.cols[key].copy())
+            return _Columns({k: v[np.asarray(key)] for k, v in self.cols.items()})
+
+    def _read_molusc(f, *args, **kw):
+        df = pd.read_csv(f, *args, **kw)
+        return _Columns({c: df[c].to_numpy(copy=True) for c in df.columns})
+    ml.read_csv = _read_molusc            # its only runtime use is the MOLUSC file
+    m = pd.read_csv(a.molusc)
+    # TRICERATOPS keeps companions with periastron beyond 10 au and pads the rest of its N draws with q = 0
+    n_used = int((m["semi-major axis(AU)"] * (1 - m["eccentricity"]) > 10).sum())
+    assert n_used <= a.draws, "MOLUSC must simulate no more companions than TRICERATOPS draws"
+    drop = [x for x in a.drop.split(",") if x]
+    fm, nm = runs(a.molusc, drop)
+    res.update(FPP_m_mean=float(np.mean(fm)), FPP_m_sem=float(np.std(fm, ddof=1) / np.sqrt(len(fm))) if len(fm) > 1 else None,
+               FPP_m=fm, NFPP_m_max=float(np.max(nm)), molusc_survivors=len(m), molusc_used=n_used, drop=drop)
 print(json.dumps(res))
-with open(a.fold.replace(".npz", f"_fpp{a.tag}.json"), "w") as fh:
+with open(out, "w") as fh:
     json.dump(res, fh)

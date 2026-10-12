@@ -9,6 +9,10 @@ vetting.json), where the correlation vanishes: sigma(t)^2 = sigma_c^2 + ((t - t_
 the larger of two estimates: the t0 marginal with the period term removed, and sigma_P times the weighted
 spread of the transit epochs (the variance of a linear ephemeris fit).
 
+The files are append-only: candidates registered by an earlier run keep their rows unchanged (only the tier column
+is updated, so candidates that leave the counted tiers stay listed with their new tier), and newly counted candidates
+are added with predictions starting at the time of the run.
+
 Usage: python predict.py [--until 2027-06-30]
 Reads results_public/, candidates/ (fits and vetting), data/catalogs/*.parquet (coordinates) and
 data/tess_schedule/TESS_orbit_times.csv (https://tess.mit.edu/public/files/TESS_orbit_times.csv). Writes
@@ -91,6 +95,16 @@ def main():
         c = pd.read_csv(ROOT / "results_public" / f)
         cands.append(c[c["tier"].isin(tiers)].assign(folder=folder))
     cands = pd.concat(cands, ignore_index=True)
+    eph_f, pred_f = ROOT / "candidates" / "ephemerides.csv", ROOT / "candidates" / "predictions.csv"
+    old_eph = pd.read_csv(eph_f) if eph_f.exists() else pd.DataFrame(columns=["TIC", "period_d"])
+    old_rows = pd.read_csv(pred_f, dtype={"tess_sector": str}) if pred_f.exists() else pd.DataFrame()
+    if "registered" not in old_eph:
+        old_eph["registered"] = "2026-10-10"
+
+    def match(tab, tic, P, col):
+        return (tab["TIC"] == tic) & ((tab[col] / P - 1).abs() < 2e-3)
+
+    cands = cands[[not match(old_eph, r.TIC, r.P_d, "period_d").any() for r in cands.itertuples()]]
     stars = coordinates(set(cands["TIC"]))
     geocentre = EarthLocation.from_geocentric(0, 0, 0, unit=u.m)
     eph, rows = [], []
@@ -129,14 +143,19 @@ def main():
                         Rp_Re=round(fit["Rp"][1], 2), next_tc_BJD_TDB=round(t[0] + 2457000, 4),
                         next_tc_sigma_min=round(sigma(t[0]) * 1440, 1),
                         tess_transits_scheduled=int((sec > 0).sum()),
-                        tess_sectors_planned=",".join(map(str, on_star))))
-    eph, rows = pd.DataFrame(eph), pd.DataFrame(rows)
-    eph.to_csv(ROOT / "candidates" / "ephemerides.csv", index=False)
-    rows.to_csv(ROOT / "candidates" / "predictions.csv", index=False)
-    last = int(wins["sector"].max())
-    print(f"{len(eph)} candidates, {len(rows)} predicted transits through {a.until}; "
-          f"{(rows['tess_sector'] != '').sum()} in published TESS windows (Sectors {first_sector}-{last}) "
-          f"for {(eph['tess_transits_scheduled'] > 0).sum()} candidates")
+                        tess_sectors_planned=",".join(map(str, on_star)), registered=Time.now().utc.iso[:10]))
+    new_eph, new_rows = pd.DataFrame(eph), pd.DataFrame(rows)
+    eph = pd.concat([old_eph, new_eph], ignore_index=True)
+    rows = pd.concat([old_rows, new_rows], ignore_index=True)
+    # current tier of every registered candidate, counted or not
+    tiers = pd.concat([pd.read_csv(ROOT / "results_public" / f)[["TIC", "P_d", "tier"]] for f, _, _ in COUNTED])
+    eph["tier"] = [next(iter(tiers.loc[match(tiers, r.TIC, r.period_d, "P_d"), "tier"]), r.tier) for r in eph.itertuples()]
+    key = dict(zip(zip(eph["TIC"], eph["period_d"].round(5)), eph["tier"]))
+    rows["tier"] = [key.get((t, round(P, 5)), x) for t, P, x in zip(rows["TIC"], rows["period_d"], rows["tier"])]
+    eph.to_csv(eph_f, index=False)
+    rows.to_csv(pred_f, index=False)
+    print(f"{len(new_eph)} candidates added ({len(new_rows)} transits from now through {a.until}); {len(eph)} registered in all, "
+          f"{int(eph['tier'].isin([t for _, _, ts in COUNTED for t in ts]).sum())} of them counted now")
 
 
 if __name__ == "__main__":

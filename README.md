@@ -5,6 +5,15 @@ the newest TESS sectors (97–105) with every earlier sector of 9,979 nearby K a
 second, added on 8 October 2026, looks for additional planets around the hosts of 6,430 TESS
 Objects of Interest (TOIs) after masking the known TOIs.
 
+- **Gaia limits on companions (11 October 2026): 546 candidates.** We reran TRICERATOPS on every counted
+  candidate with limits from Gaia DR3: MOLUSC removes bound companions that Gaia would have resolved or
+  that would raise the star's RUWE, and for bright stars the Gaia epoch RVs rule out an eclipsing binary
+  on the target. The median false-positive probability falls from 0.042 to 0.013, and 236 candidates
+  meet the validation thresholds apart from high-resolution imaging (62 before). With the same bar
+  applied to the constrained values in both directions, 5 candidates left and 10 joined, and two stars
+  that Gaia shows to be spectroscopic binaries moved to likely eclipsing binaries: 488 full-sky
+  candidates and 58 from the earlier searches
+  ([details](validation/gaia_companion_limits.md)).
 - **Full-sky search, second release (9 October 2026): 483 candidates** (tiers A, B, N and L1 below)
   from 4.04 million FGKM dwarfs brighter than T = 13.5, combining all of their TESS sectors (1–104).
   Every one passes TRICERATOPS (FPP < 0.5, NFPP < 0.1) and a false-alarm test calibrated on the
@@ -315,6 +324,9 @@ that earlier passed every automated check (TIC 9994636 and TIC 235005571). Tier 
 on the star) and tier B (single) are counted as candidates; tier C (grazing, or RUWE > 1.4) is listed
 but not counted. Of the 66 earlier candidates, 24 are tier A, 36 tier B and 6 tier C
 ([`results_public/tiers_earlier_candidates.csv`](results_public/tiers_earlier_candidates.csv)).
+On 11 October the earlier candidates were also held to the full-sky TRICERATOPS bar (with Gaia limits and the
+centroid Bayes factor); TIC 351339274 and 394657305 fail it on NFPP and move to tier C, leaving 24 in tier A
+and 34 in tier B.
 
 **Reliability and completeness, measured on a 1% pilot** (40,797 random stars; superseded by
 the 798,769-star measurement in the second release below). Inverted copies of
@@ -407,15 +419,30 @@ tier C, so every counted full-sky candidate meets the same bar. In all, 137 firs
 moved to tier C (78 for MES < 10 and 59 for TRICERATOPS), and 4 tier A candidates became tier B
 because the other signal on their star moved.
 
-| Tier | Full-sky first release | Second release |
-|---|---|---|
-| A (several candidates on the star) | 19 | 11 |
-| B (single) | 381 | 252 |
-| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 |
-| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 |
-| C (grazing, RUWE > 1.4, MES < 10, or TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1; not counted) | 184 | 456 |
-| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 |
-| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 |
+**Gaia limits on companions (11 October 2026).** We reran TRICERATOPS on every counted candidate
+and on every signal that had failed only the TRICERATOPS bar: ten runs with the default priors and ten
+with limits from Gaia DR3, on the same light curves. MOLUSC (Wood et al. 2021) removes bound companions
+that Gaia would have resolved or that would raise the star's RUWE above its measured value. For 141
+bright stars, the Gaia epoch-RV scatter rules out an eclipsing binary on the target. The median FPP of
+the counted candidates falls from 0.042 to 0.013, and 236 meet the validation thresholds apart from
+imaging (62 before). The bar now uses the constrained values, in both directions:
+- 5 candidates leave, all within the run-to-run scatter of the threshold.
+- 10 join: 5 from tier C and 5 neighbour-recovered signals, which were fitted for this update.
+- TIC 94673748 and 258641782, whose Gaia RVs vary by 26 and 57 km/s, become likely eclipsing binaries.
+
+Columns `FPP_g`, `NFPP_g`, `FPP_gc` and `NFPP_gc` hold the constrained values, and `rv_flag` the Gaia
+RV result. The method and per-signal results are in
+[`validation/gaia_companion_limits.md`](validation/gaia_companion_limits.md).
+
+| Tier | Full-sky first release | Second release | With Gaia limits (11 October) |
+|---|---|---|---|
+| A (several candidates on the star) | 19 | 11 | 11 |
+| B (single) | 381 | 252 | 254 |
+| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 | 173 |
+| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 | 50 |
+| C (grazing, RUWE > 1.4, MES < 10, or TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1; not counted) | 184 | 456 | 455 |
+| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 | 56 |
+| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 | 1,427 |
 
 All 2,426 signals, with fits, centroids, binary checks and TRICERATOPS results where computed, are in
 [`results_public/candidates_allsky.csv`](results_public/candidates_allsky.csv) (column `set`: SNR ≥ 9,
@@ -424,13 +451,15 @@ SNR 7.5–9, or neighbour within 15″); tiers A, B, C, N, L1 and L have folders
 
 ### Predicted transit times
 
-[`candidates/ephemerides.csv`](candidates/ephemerides.csv) gives the ephemeris of each of the 543
-counted candidates (tiers A, B, N and L1, including the earlier searches), with coordinates, the next
-transit, and the TESS sectors planned for the star. [`candidates/predictions.csv`](candidates/predictions.csv)
-lists all 35,223 predicted transits from 10 October 2026 through June 2027, with the 1σ uncertainty,
+[`candidates/ephemerides.csv`](candidates/ephemerides.csv) gives the ephemeris of each registered
+candidate, with coordinates, the next transit, and the TESS sectors planned for the star. There are 553:
+the 543 counted on 10 October and 10 that joined on 11 October (column `registered`). The files are
+append-only. Candidates that leave the counted tiers keep their rows, with their current tier.
+[`candidates/predictions.csv`](candidates/predictions.csv)
+lists all 36,423 predicted transits from the registration date through June 2027, with the 1σ uncertainty,
 the UTC time at Earth's centre, and the TESS sector when the transit falls inside a published TESS
 orbit window and the star is on a detector. The median 1σ uncertainty of the next transit is 12 min.
-62 candidates have 656 transits in the published windows of Sectors 109–111 (through 3 December
+Of the 543 registered on 10 October, 62 have 656 transits in the published windows of Sectors 109–111 (through 3 December
 2026), all with 1σ uncertainties shorter than the transit duration, and 343 candidates are on
 detectors in sectors planned through Sector 134 (tess-point 0.9.5.post1). These files were
 committed before those data exist: for a planet, each transit should appear at the predicted time
@@ -647,13 +676,17 @@ EXO_INVERT=1 ../.venv/bin/python run_shard.py sample.parquet manifest.parquet --
     --out ../results/search_inv_allsky --keep-snr 7.5
 ../.venv/bin/python fa_classifier.py ../validation/false_alarm_classifier_table.csv.gz \
     --stars-real 4039203 --stars-inv 399408 399361     # false-alarm classifier (tier L1)
+# Gaia limits on companions (11 October): MOLUSC per star, then default and constrained TRICERATOPS runs
+../.venv/bin/python molusc_batch.py stars.parquet --gaia gaia_dr3.csv --molusc MOLUSC/code --out ../results/molusc
+EXO_DATA_SOURCE=s3 ../.venv/bin/python fpp_batch.py list.csv --stars stars.parquet --out ../results/fpp_m \
+    --molusc ../results/molusc
 ```
 
 `EXO_DATA_SOURCE=s3` reads light curves from the STScI open-data bucket and falls back to MAST.
 Inside AWS us-east-1 this is about 20 times faster than downloading from MAST.
 
 `targets.txt` is one TIC ID per line. Per-candidate follow-up: `fit_transit.py`, `export_fold.py`,
-`fpp.py` (in `.venv-trice`), `candidate_table.py`, `predict.py`, `make_figures.py`,
+`fpp.py` (in `.venv-trice`), `molusc_batch.py`, `candidate_table.py`, `predict.py`, `make_figures.py`,
 `package_candidates.py`. Light curves and catalogs are downloaded into `data/` and are not part
 of the repository.
 
@@ -679,7 +712,7 @@ and Space Administration under the Exoplanet Exploration Program, and of the NAS
 Archive, and of the VizieR catalogue access tool and the CDS XMatch service (CDS, Strasbourg). The
 literature check uses the RAVEN (Lafarga et al. 2026) and T16 (Roth et al. 2026)
 catalogues and arXiv. Software: astropy, numpy, scipy, numba, lightkurve, wotan, batman, emcee,
-LEO-Vetter, transit-diffImage, tess-point, astrocut and TRICERATOPS.
+LEO-Vetter, transit-diffImage, tess-point, astrocut, TRICERATOPS and MOLUSC.
 
 Method inspired by Pavel Rabtsevich's TIC 4206066 study. Built with Claude Code (Anthropic).
 
