@@ -2,7 +2,9 @@
 
 On 12 October 2026 we checked when the counted full-sky candidates could have been found, and why the TESS pipelines
 did not report them. The numbers cover the 438 full-sky candidates in tiers A, B and N (the SNR ≥ 9 search); the
-tier L1 candidates are weaker still. Files:
+tier L1 candidates are weaker still. Later the same day, the per-sector centroid test moved 18 of the 438 out of the
+counted tiers ([`centroid_sectors.md`](centroid_sectors.md)); the numbers here include them, and for the remaining 420
+the percentages are within one point of these. Files:
 - [`findability_transits.csv.gz`](findability_transits.csv.gz): the search's per-transit depths, one row per transit,
   with the sector and that sector's light-curve source (SPOC 2-minute, TESS-SPOC or QLP);
 - [`findability.csv`](findability.csv): per candidate, the SNR by data date and the best single-sector SNR
