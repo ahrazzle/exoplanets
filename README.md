@@ -5,6 +5,12 @@ the newest TESS sectors (97–105) with every earlier sector of 9,979 nearby K a
 second, added on 8 October 2026, looks for additional planets around the hosts of 6,430 TESS
 Objects of Interest (TOIs) after masking the known TOIs.
 
+- **Centroids in every sector (12 October 2026): 528 candidates.** The pixel checks had used the centroid offset of
+  one difference image. We now measure it in every sector with transits and test whether the offsets point
+  consistently away from the target. On 565 known planets the test never rejects the target at p < 0.001; on 175
+  signals known to come from neighbouring stars it does so 73% of the time. 18 counted candidates reject their target
+  at p < 0.001 and leave the counted tiers (16 to likely nearby false positive, 2 to tier C), and 13 more at p < 0.01
+  are flagged: 470 full-sky candidates and 58 from the earlier searches ([details](validation/centroid_sectors.md)).
 - **Why earlier searches missed these signals (12 October 2026).** The data are not new. With only the transits
   observed through Sector 55 (September 2022), 47% of the full-sky candidates in tiers A, B and N already reach
   SNR 9, and 93% with those through Sector 96; only 24 needed Sectors 97–104. What hid them is that they are weak in
@@ -441,15 +447,24 @@ Columns `FPP_g`, `NFPP_g`, `FPP_gc` and `NFPP_gc` hold the constrained values, a
 RV result. The method and per-signal results are in
 [`validation/gaia_companion_limits.md`](validation/gaia_companion_limits.md).
 
-| Tier | Full-sky first release | Second release | With Gaia limits (11 October) |
-|---|---|---|---|
-| A (several candidates on the star) | 19 | 11 | 11 |
-| B (single) | 381 | 252 | 254 |
-| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 | 173 |
-| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 | 50 |
-| C (grazing, RUWE > 1.4, MES < 10, or TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1; not counted) | 184 | 456 | 455 |
-| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 | 56 |
-| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 | 1,427 |
+**Centroids in every sector (12 October 2026).** We measured the difference-image centroid of every counted
+candidate in every sector with transits (`centroid_sectors.py`) and tested whether the mean offset is consistent with
+the target and with each star within 2′ bright enough to cause the dip (`centroid_test.py`). On 565 known planets the
+target is never rejected at p < 0.001 (3 at p < 0.01); on 175 full-sky signals from TOIs on neighbouring stars it is
+rejected in 73% at p < 0.001 (38% when the source is within 15″), and the true source fits in 94%. 18 counted
+candidates reject their target at p < 0.001: 16, which a nearby star fits, become likely nearby false positives, and
+2 go to tier C. 13 more, at p < 0.01, stay counted with `centroid_flag` set. Details:
+[`validation/centroid_sectors.md`](validation/centroid_sectors.md).
+
+| Tier | Full-sky first release | Second release | With Gaia limits (11 October) | Centroids in every sector (12 October) |
+|---|---|---|---|---|
+| A (several candidates on the star) | 19 | 11 | 11 | 11 |
+| B (single) | 381 | 252 | 254 | 250 |
+| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 | 173 | 159 |
+| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 | 50 | 50 |
+| C (grazing, RUWE > 1.4, MES < 10, TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1, or a centroid offset in all sectors; not counted) | 184 | 456 | 455 | 457 |
+| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 | 56 | 56 |
+| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 | 1,427 | 1,443 |
 
 All 2,426 signals, with fits, centroids, binary checks and TRICERATOPS results where computed, are in
 [`results_public/candidates_allsky.csv`](results_public/candidates_allsky.csv) (column `set`: SNR ≥ 9,
@@ -460,8 +475,8 @@ SNR 7.5–9, or neighbour within 15″); tiers A, B, C, N, L1 and L have folders
 
 [`candidates/ephemerides.csv`](candidates/ephemerides.csv) gives the ephemeris of each registered
 candidate, with coordinates, the next transit, and the TESS sectors planned for the star. There are 553:
-the 543 counted on 10 October and 10 that joined on 11 October (column `registered`). The files are
-append-only. Candidates that leave the counted tiers keep their rows, with their current tier.
+the 543 counted on 10 October and 10 that joined on 11 October (column `registered`); 528 are counted now. The
+files are append-only. Candidates that leave the counted tiers keep their rows, with their current tier.
 [`candidates/predictions.csv`](candidates/predictions.csv)
 lists all 36,423 predicted transits from the registration date through June 2027, with the 1σ uncertainty,
 the UTC time at Earth's centre, and the TESS sector when the transit falls inside a published TESS
@@ -692,6 +707,9 @@ EXO_DATA_SOURCE=s3 ../.venv/bin/python fpp_batch.py list.csv --stars stars.parqu
 ../.venv/bin/python findability.py transits --cands ../results/shard*/cands_allsky.csv
 ../.venv/bin/python findability.py
 ../.venv/bin/python spoc_recheck.py --lc-dir ../data/spoc_2min
+# centroids in every sector (12 October): difference-image fits per sector (inside AWS), then the test
+EXO_DATA_SOURCE=s3 ../.venv/bin/python centroid_sectors.py ../validation/centroid_sectors_list.csv --out ../results/cs
+../.venv/bin/python centroid_test.py --dir ../results/cs       # without --dir, reruns from validation/ alone
 ```
 
 `EXO_DATA_SOURCE=s3` reads light curves from the STScI open-data bucket and falls back to MAST.
