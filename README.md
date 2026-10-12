@@ -5,6 +5,13 @@ the newest TESS sectors (97–105) with every earlier sector of 9,979 nearby K a
 second, added on 8 October 2026, looks for additional planets around the hosts of 6,430 TESS
 Objects of Interest (TOIs) after masking the known TOIs.
 
+- **Why earlier searches missed these signals (12 October 2026).** The data are not new. With only the transits
+  observed through Sector 55 (September 2022), 47% of the full-sky candidates in tiers A, B and N already reach
+  SNR 9, and 93% with those through Sector 96; only 24 needed Sectors 97–104. What hid them is that they are weak in
+  any one sector (half never reach SPOC's threshold of 7.1 in a single sector) and that 82% are on stars observed only
+  in full-frame images, which SPOC's multi-sector searches do not cover. Of the 78 with 2-minute data, re-measured in
+  SPOC's own light curves, 7 reach 7.1 with our noise estimate and 2 with SPOC's
+  ([details](validation/findability.md)).
 - **Gaia limits on companions (11 October 2026): 546 candidates.** We reran TRICERATOPS on every counted
   candidate with limits from Gaia DR3: MOLUSC removes bound companions that Gaia would have resolved or
   that would raise the star's RUWE, and for bright stars the Gaia epoch RVs rule out an eclipsing binary
@@ -680,6 +687,11 @@ EXO_INVERT=1 ../.venv/bin/python run_shard.py sample.parquet manifest.parquet --
 ../.venv/bin/python molusc_batch.py stars.parquet --gaia gaia_dr3.csv --molusc MOLUSC/code --out ../results/molusc
 EXO_DATA_SOURCE=s3 ../.venv/bin/python fpp_batch.py list.csv --stars stars.parquet --out ../results/fpp_m \
     --molusc ../results/molusc
+# why earlier searches missed the full-sky candidates (12 October): SNR by data date, and a re-check of the
+# candidates with 2-minute data in SPOC's own light curves
+../.venv/bin/python findability.py transits --cands ../results/shard*/cands_allsky.csv
+../.venv/bin/python findability.py
+../.venv/bin/python spoc_recheck.py --lc-dir ../data/spoc_2min
 ```
 
 `EXO_DATA_SOURCE=s3` reads light curves from the STScI open-data bucket and falls back to MAST.
