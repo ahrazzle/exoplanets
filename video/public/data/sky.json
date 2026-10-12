@@ -1,0 +1,10 @@
+{
+ "count": 4039203,
+ "frame": "barycentric true ecliptic",
+ "order": "Tmag ascending",
+ "layout": [
+  "lonlat float32[count][2] degrees",
+  "tmag uint16[count] x1000",
+  "teff uint16[count] K"
+ ]
+}

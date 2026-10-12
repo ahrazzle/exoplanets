@@ -1,0 +1,15 @@
+# Media and other large or generated files. The binaries the film needs are a release asset: tools/fetch_assets.sh
+node_modules/
+.venv/
+__pycache__/
+.DS_Store
+/out/
+/audio/
+/data/
+/_old/
+# the repository ignores directories named data, but the film's prepared data are small and belong here
+!/public/data/
+!/src/data/
+/public/audio/
+/public/data/sky.bin
+/src/data/_v9/

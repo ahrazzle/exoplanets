@@ -1,0 +1,253 @@
+{
+ "length": 222.56,
+ "music": {
+  "file": "audio/music_suno.wav",
+  "segments": [
+   {
+    "video_start": 0.0,
+    "track_start": 8.98,
+    "track_end": 67.08
+   },
+   {
+    "video_start": 58.1,
+    "track_start": 49.25,
+    "track_end": 223.453
+   }
+  ],
+  "pulse_enters": 9.06,
+  "section_change": 187.02,
+  "final_downbeat": 218.36
+ },
+ "voice": "allison_104",
+ "mix": {
+  "music_under_lufs": -22.0,
+  "end_lift_db": 7.0,
+  "speech_band_dip_db": 3.0
+ },
+ "phrases": [
+  {
+   "clip": "beat1",
+   "alignment": "audio/vo/allison_104/beat1.json",
+   "clip_start": 0.0,
+   "start": 1.0,
+   "end": 5.832,
+   "text": "We searched four million stars for planets hiding in NASA's public data."
+  },
+  {
+   "clip": "beat2",
+   "alignment": "audio/vo/allison_104/beat2.json",
+   "clip_start": 0.0,
+   "start": 7.332,
+   "end": 36.332,
+   "text": "Exoplanets, planets around other stars, are lost in their stars' glare, so we can almost never see them directly. But when one passes in front of its star, the star dims, very slightly. Earth would dim the Sun by less than one part in ten thousand. And only a few planets line up just right for us to see this, so you have to watch a lot of stars. Since 2018, NASA's TESS satellite has been doing just that."
+  },
+  {
+   "clip": "beat3",
+   "alignment": "audio/vo/allison_104/beat3.json",
+   "clip_start": 0.0,
+   "start": 37.832,
+   "end": 46.982,
+   "text": "This search was inspired by independent researcher Pavel Rabtsevich, who found two possible planets around a nearby star in TESS's newest data."
+  },
+  {
+   "clip": "beat3e",
+   "alignment": "audio/vo/allison_104/beat3e.json",
+   "clip_start": 0.0,
+   "start": 49.663,
+   "end": 56.869,
+   "text": "Building on his method, we took every star like the Sun or smaller, and joined up to eight years of observations."
+  },
+  {
+   "clip": "beat3c",
+   "alignment": "audio/vo/allison_104/beat3c.json",
+   "clip_start": 6.05,
+   "start": 58.545,
+   "end": 60.857,
+   "text": "One dip is too faint to see."
+  },
+  {
+   "clip": "beat3c",
+   "alignment": "audio/vo/allison_104/beat3c.json",
+   "clip_start": 8.66,
+   "start": 62.198,
+   "end": 68.091,
+   "text": "But a planet's orbit always takes the same time, so its dips repeat at regular intervals."
+  },
+  {
+   "clip": "beat3c",
+   "alignment": "audio/vo/allison_104/beat3c.json",
+   "clip_start": 14.88,
+   "start": 69.766,
+   "end": 79.094,
+   "text": "We don't know how long the orbit takes, so we try thousands of guesses. For each guess, we cut the data into pieces that long and stack them."
+  },
+  {
+   "clip": "beat3g",
+   "alignment": "audio/vo/allison_104/beat3g.json",
+   "clip_start": 4.57,
+   "start": 81.441,
+   "end": 85.772,
+   "text": "When the guess is right, the dips line up and stand out from the noise."
+  },
+  {
+   "clip": "beat4c",
+   "alignment": "audio/vo/allison_104/beat4c.json",
+   "clip_start": 0.0,
+   "start": 89.124,
+   "end": 95.286,
+   "text": "Across four million stars, the search found seven and a half million of these repeating dips."
+  },
+  {
+   "clip": "beat4c",
+   "alignment": "audio/vo/allison_104/beat4c.json",
+   "clip_start": 6.495,
+   "start": 96.291,
+   "end": 102.16,
+   "text": "Almost none are planets. Most are noise, or pairs of stars eclipsing each other."
+  },
+  {
+   "clip": "beat4c",
+   "alignment": "audio/vo/allison_104/beat4c.json",
+   "clip_start": 12.67,
+   "start": 103.836,
+   "end": 112.364,
+   "text": "So every one had to pass seventeen statistical tests, each looking for a different warning sign, like a dip with the wrong shape."
+  },
+  {
+   "clip": "beat4c",
+   "alignment": "audio/vo/allison_104/beat4c.json",
+   "clip_start": 21.535,
+   "start": 115.38,
+   "end": 121.369,
+   "text": "Then a pixel-level check: is the dip really on the star we expected, or on a neighbour?"
+  },
+  {
+   "clip": "beat5",
+   "alignment": "audio/vo/allison_104/beat5.json",
+   "clip_start": 0.0,
+   "start": 124.386,
+   "end": 126.234,
+   "text": "How do we know the filter works?"
+  },
+  {
+   "clip": "beat5",
+   "alignment": "audio/vo/allison_104/beat5.json",
+   "clip_start": 2.125,
+   "start": 127.575,
+   "end": 131.09,
+   "text": "It finds known planets without being told where they are."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 0.0,
+   "start": 133.101,
+   "end": 139.936,
+   "text": "But how often does noise fool it? To measure that, we need data with the same noise, but no planets."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 6.97,
+   "start": 141.276,
+   "end": 146.319,
+   "text": "So we took eight hundred thousand stars and flipped their data upside down."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 12.29,
+   "start": 147.66,
+   "end": 151.833,
+   "text": "That turns a planet's dip into a bump, which the search ignores."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 16.68,
+   "start": 152.839,
+   "end": 156.947,
+   "text": "But noise wiggles both ways, so it still makes fake dips."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 21.02,
+   "start": 158.287,
+   "end": 161.23,
+   "text": "Anything the search finds there is a false alarm."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 24.195,
+   "start": 162.571,
+   "end": 167.054,
+   "text": "Counting them tells us how many of our candidates are likely false alarms, too."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 29.005,
+   "start": 168.394,
+   "end": 172.547,
+   "text": "Almost half the weak dips were false alarms, so we left them out."
+  },
+  {
+   "clip": "beat5c",
+   "alignment": "audio/vo/allison_104/beat5c.json",
+   "clip_start": 33.41,
+   "start": 174.223,
+   "end": 178.743,
+   "text": "We also used the fake dips to train a filter that recognizes false alarms."
+  },
+  {
+   "clip": "beat5d",
+   "alignment": "audio/vo/allison_104/beat5d.json",
+   "clip_start": 4.94,
+   "start": 180.083,
+   "end": 184.403,
+   "text": "Even among the weakest dips, it found fifty that are probably real."
+  },
+  {
+   "clip": "beat6d",
+   "alignment": "audio/vo/allison_104/beat6d.json",
+   "clip_start": 0.0,
+   "start": 186.75,
+   "end": 192.037,
+   "text": "In the end, five hundred forty-six planet candidates survived all these filters."
+  },
+  {
+   "clip": "beat6",
+   "alignment": "audio/vo/allison_104/beat6.json",
+   "clip_start": 4.07,
+   "start": 194.438,
+   "end": 197.85,
+   "text": "More than half are between the size of Earth and Neptune:"
+  },
+  {
+   "clip": "beat6",
+   "alignment": "audio/vo/allison_104/beat6.json",
+   "clip_start": 7.6,
+   "start": 198.811,
+   "end": 203.772,
+   "text": "the most common kind of planet in the galaxy, and one our solar system doesn't have."
+  },
+  {
+   "clip": "beat7",
+   "alignment": "audio/vo/allison_104/beat7.json",
+   "clip_start": 0.0,
+   "start": 207.293,
+   "end": 210.044,
+   "text": "They're candidates, not confirmed planets."
+  },
+  {
+   "clip": "beat7",
+   "alignment": "audio/vo/allison_104/beat7.json",
+   "clip_start": 8.685,
+   "start": 212.285,
+   "end": 216.56,
+   "text": "Now it's up to telescopes on the ground to find out which ones are real."
+  }
+ ]
+}

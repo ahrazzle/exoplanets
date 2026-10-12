@@ -1,0 +1,446 @@
+[
+{
+"text": "We searched 4 million stars",
+"s": 1.0,
+"e": 3.231,
+"clip": "beat1"
+},
+{
+"text": "for planets hiding in NASA's public data.",
+"s": 3.308,
+"e": 6.0,
+"clip": "beat1"
+},
+{
+"text": "Exoplanets, planets around other stars,",
+"s": 7.332,
+"e": 10.563,
+"clip": "beat2"
+},
+{
+"text": "are lost in their stars' glare,",
+"s": 10.64,
+"e": 12.794,
+"clip": "beat2"
+},
+{
+"text": "so we can almost never see them directly.",
+"s": 12.87,
+"e": 15.678,
+"clip": "beat2"
+},
+{
+"text": "But when one passes in front of its star,",
+"s": 15.717,
+"e": 18.14,
+"clip": "beat2"
+},
+{
+"text": "the star dims, very slightly.",
+"s": 18.178,
+"e": 20.986,
+"clip": "beat2"
+},
+{
+"text": "Earth would dim the Sun",
+"s": 21.024,
+"e": 22.101,
+"clip": "beat2"
+},
+{
+"text": "by less than 1 part in 10,000.",
+"s": 22.178,
+"e": 25.306,
+"clip": "beat2"
+},
+{
+"text": "And only a few planets line up just right",
+"s": 25.358,
+"e": 27.794,
+"clip": "beat2"
+},
+{
+"text": "for us to see this,",
+"s": 27.87,
+"e": 29.14,
+"clip": "beat2"
+},
+{
+"text": "so you have to watch a lot of stars.",
+"s": 29.178,
+"e": 31.986,
+"clip": "beat2"
+},
+{
+"text": "Since 2018, NASA's TESS satellite",
+"s": 32.024,
+"e": 34.947,
+"clip": "beat2"
+},
+{
+"text": "has been doing just that.",
+"s": 35.024,
+"e": 36.947,
+"clip": "beat2"
+},
+{
+"text": "This search was inspired by",
+"s": 37.832,
+"e": 39.447,
+"clip": "beat3"
+},
+{
+"text": "independent researcher Pavel Rabtsevich,",
+"s": 39.524,
+"e": 42.255,
+"clip": "beat3"
+},
+{
+"text": "who found two possible planets",
+"s": 42.294,
+"e": 44.063,
+"clip": "beat3"
+},
+{
+"text": "around a nearby star in TESS's newest data.",
+"s": 44.14,
+"e": 47.652,
+"clip": "beat3"
+},
+{
+"text": "Building on his method,",
+"s": 49.663,
+"e": 51.163,
+"clip": "beat3e"
+},
+{
+"text": "we took every star like the Sun or smaller,",
+"s": 51.201,
+"e": 54.163,
+"clip": "beat3e"
+},
+{
+"text": "and joined up to 8 years of observations.",
+"s": 54.201,
+"e": 57.278,
+"clip": "beat3e"
+},
+{
+"text": "One dip is too faint to see.",
+"s": 58.957,
+"e": 61.444,
+"clip": "beat3c"
+},
+{
+"text": "But a planet's orbit always takes the same time,",
+"s": 62.512,
+"e": 65.615,
+"clip": "beat3c"
+},
+{
+"text": "so its dips repeat at regular intervals.",
+"s": 65.692,
+"e": 68.73,
+"clip": "beat3c"
+},
+{
+"text": "We don't know how long the orbit takes,",
+"s": 70.117,
+"e": 72.463,
+"clip": "beat3c"
+},
+{
+"text": "so we try thousands of guesses.",
+"s": 72.501,
+"e": 74.924,
+"clip": "beat3c"
+},
+{
+"text": "For each guess, we cut the data",
+"s": 74.963,
+"e": 76.886,
+"clip": "beat3c"
+},
+{
+"text": "into pieces that long and stack them.",
+"s": 76.963,
+"e": 79.771,
+"clip": "beat3c"
+},
+{
+"text": "When the guess is right,",
+"s": 81.717,
+"e": 82.986,
+"clip": "beat3g"
+},
+{
+"text": "the dips line up and stand out from the noise.",
+"s": 83.025,
+"e": 86.409,
+"clip": "beat3g"
+},
+{
+"text": "Across 4 million stars,",
+"s": 89.124,
+"e": 91.355,
+"clip": "beat4c"
+},
+{
+"text": "the search found 7.5 million",
+"s": 91.432,
+"e": 93.816,
+"clip": "beat4c"
+},
+{
+"text": "of these repeating dips.",
+"s": 93.893,
+"e": 95.893,
+"clip": "beat4c"
+},
+{
+"text": "Almost none are planets.",
+"s": 96.642,
+"e": 98.719,
+"clip": "beat4c"
+},
+{
+"text": "Most are noise,",
+"s": 98.911,
+"e": 100.027,
+"clip": "beat4c"
+},
+{
+"text": "or pairs of stars eclipsing each other.",
+"s": 100.142,
+"e": 102.719,
+"clip": "beat4c"
+},
+{
+"text": "So every one had to pass",
+"s": 104.166,
+"e": 105.781,
+"clip": "beat4c"
+},
+{
+"text": "17 statistical tests,",
+"s": 105.897,
+"e": 108.204,
+"clip": "beat4c"
+},
+{
+"text": "each looking for a different warning sign,",
+"s": 108.243,
+"e": 110.666,
+"clip": "beat4c"
+},
+{
+"text": "like a dip with the wrong shape.",
+"s": 110.704,
+"e": 113.012,
+"clip": "beat4c"
+},
+{
+"text": "Then a pixel-level check:",
+"s": 115.768,
+"e": 117.845,
+"clip": "beat4c"
+},
+{
+"text": "is the dip really on the star we expected,",
+"s": 117.922,
+"e": 120.422,
+"clip": "beat4c"
+},
+{
+"text": "or on a neighbour?",
+"s": 120.46,
+"e": 121.999,
+"clip": "beat4c"
+},
+{
+"text": "How do we know the filter works?",
+"s": 124.386,
+"e": 126.732,
+"clip": "beat5"
+},
+{
+"text": "It finds known planets",
+"s": 127.835,
+"e": 129.296,
+"clip": "beat5"
+},
+{
+"text": "without being told where they are.",
+"s": 129.373,
+"e": 131.642,
+"clip": "beat5"
+},
+{
+"text": "But how often does noise fool it?",
+"s": 133.101,
+"e": 135.716,
+"clip": "beat5c"
+},
+{
+"text": "To measure that, we need data",
+"s": 135.793,
+"e": 137.486,
+"clip": "beat5c"
+},
+{
+"text": "with the same noise, but no planets.",
+"s": 137.563,
+"e": 140.255,
+"clip": "beat5c"
+},
+{
+"text": "So we took 800,000 stars",
+"s": 141.537,
+"e": 144.152,
+"clip": "beat5c"
+},
+{
+"text": "and flipped their data upside down.",
+"s": 144.229,
+"e": 146.883,
+"clip": "beat5c"
+},
+{
+"text": "That turns a planet's dip into a bump,",
+"s": 147.985,
+"e": 150.601,
+"clip": "beat5c"
+},
+{
+"text": "which the search ignores.",
+"s": 150.678,
+"e": 152.255,
+"clip": "beat5c"
+},
+{
+"text": "But noise wiggles both ways,",
+"s": 153.082,
+"e": 155.121,
+"clip": "beat5c"
+},
+{
+"text": "so it still makes fake dips.",
+"s": 155.159,
+"e": 157.428,
+"clip": "beat5c"
+},
+{
+"text": "Anything the search finds there",
+"s": 158.575,
+"e": 160.19,
+"clip": "beat5c"
+},
+{
+"text": "is a false alarm.",
+"s": 160.229,
+"e": 161.69,
+"clip": "beat5c"
+},
+{
+"text": "Counting them tells us how many",
+"s": 162.838,
+"e": 164.376,
+"clip": "beat5c"
+},
+{
+"text": "of our candidates are likely false alarms, too.",
+"s": 164.453,
+"e": 167.722,
+"clip": "beat5c"
+},
+{
+"text": "Almost half the weak dips were false alarms,",
+"s": 168.774,
+"e": 171.427,
+"clip": "beat5c"
+},
+{
+"text": "so we left them out.",
+"s": 171.466,
+"e": 173.043,
+"clip": "beat5c"
+},
+{
+"text": "We also used the fake dips to train a filter",
+"s": 174.505,
+"e": 176.967,
+"clip": "beat5c"
+},
+{
+"text": "that recognizes false alarms.",
+"s": 177.044,
+"e": 179.236,
+"clip": "beat5c"
+},
+{
+"text": "Even among the weakest dips,",
+"s": 180.297,
+"e": 182.194,
+"clip": "beat5d"
+},
+{
+"text": "it found 50 that are probably real.",
+"s": 182.246,
+"e": 184.989,
+"clip": "beat5d"
+},
+{
+"text": "In the end, 546 planet candidates",
+"s": 186.75,
+"e": 190.212,
+"clip": "beat6d"
+},
+{
+"text": "survived all these filters.",
+"s": 190.288,
+"e": 192.596,
+"clip": "beat6d"
+},
+{
+"text": "More than half are between",
+"s": 194.753,
+"e": 195.906,
+"clip": "beat6"
+},
+{
+"text": "the size of Earth and Neptune:",
+"s": 195.983,
+"e": 198.086,
+"clip": "beat6"
+},
+{
+"text": "the most common kind of planet in the galaxy,",
+"s": 198.954,
+"e": 201.48,
+"clip": "beat6"
+},
+{
+"text": "and one our solar system doesn't have.",
+"s": 201.519,
+"e": 204.365,
+"clip": "beat6"
+},
+{
+"text": "They're candidates, not confirmed planets.",
+"s": 207.293,
+"e": 210.293,
+"clip": "beat7"
+},
+{
+"text": "Now it's up to telescopes on the ground",
+"s": 212.6,
+"e": 214.754,
+"clip": "beat7"
+},
+{
+"text": "to find out which ones are real.",
+"s": 214.831,
+"e": 216.908,
+"clip": "beat7"
+}
+]
