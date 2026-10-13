@@ -2,6 +2,8 @@
 Reads the per-sector centroids of centroid_sectors.py (offsets east and north of the target, arcsec) and, for each
 signal, tests whether the mean offset over sectors is consistent with the target and with each TIC star within 2'
 that is bright enough to cause the dip (a total eclipse of that star would dilute to at least the observed depth).
+TIC entries flagged ARTIFACT or DUPLICATE are not stars (Paegert et al. 2021) and are left out when the stars file
+has their dispositions (--add-dispositions looks them up).
 
 The test treats the per-sector offsets as scattered isotropically about the source with a common, unknown spread:
 F = (n |mean - s|^2 / 2) / (RSS / (2(n - 1))) follows F(2, 2(n - 1)) if the source is at s, where RSS is the
@@ -28,6 +30,7 @@ from scipy.stats import f as f_dist
 ROOT = Path(__file__).resolve().parent.parent
 FLOOR = 1.0                      # arcsec per axis
 MAX_OFFSET = 60.0                # a fit this far from the target failed; such sectors are dropped
+PHANTOM = ("ARTIFACT", "DUPLICATE")
 
 
 def p_source(v, s, floor=FLOOR):
@@ -60,6 +63,21 @@ def load_json(L, d):
     return pd.DataFrame(per), pd.DataFrame(stars)
 
 
+def add_dispositions(L, stars):
+    """TIC disposition of every star that could cause a signal's dip (the only ones the test uses), from MAST."""
+    from astroquery.mast import Catalogs
+    t = stars.merge(L[["key", "tic", "depth_ppm"]].rename(columns={"tic": "host"}), on="key")
+    t0 = t[t.tic == t.host].set_index("key").Tmag
+    cap = t[(t.tic != t.host) & (10 ** (-0.4 * (t.Tmag - t.key.map(t0))) >= t.depth_ppm * 1e-6)]
+    ids = sorted(set(cap.tic.astype(int)))
+    disp = {}
+    for i in range(0, len(ids), 500):
+        q = Catalogs.query_criteria(catalog="TIC", ID=ids[i:i + 500]).to_pandas()
+        disp.update(zip(q.ID.astype(int), q.disposition))
+    stars["disposition"] = stars.tic.map(disp)
+    return stars
+
+
 def analyse(L, per, stars, floor=FLOOR):
     rows = []
     P = {k: g for k, g in per.groupby("key")}
@@ -72,6 +90,8 @@ def analyse(L, per, stars, floor=FLOOR):
         ok = ok[np.hypot(ok.east, ok.north) <= MAX_OFFSET]
         v = ok[["east", "north"]].to_numpy(float)
         st = S.get(r.key, pd.DataFrame(columns=["tic", "east", "north", "sep", "Tmag"]))
+        if "disposition" in st:                  # TIC artifacts and duplicates are not stars (Paegert et al. 2021)
+            st = st[~st["disposition"].isin(PHANTOM)]
         tgt = st[st.tic == r.tic]
         t_mag = float(tgt.Tmag.iloc[0]) if len(tgt) else np.nan
         cap = st[(st.tic != r.tic) & (10 ** (-0.4 * (st.Tmag - t_mag)) >= r.depth_ppm * 1e-6)]
@@ -100,6 +120,8 @@ def main():
     ap.add_argument("--list", default=str(ROOT / "validation" / "centroid_sectors_list.csv"))
     ap.add_argument("--dir", help="JSON files of centroid_sectors.py")
     ap.add_argument("--floor", type=float, default=FLOOR)
+    ap.add_argument("--add-dispositions", action="store_true",
+                    help="look up the TIC disposition of every capable star and store it in the stars file")
     a = ap.parse_args()
     L = pd.read_csv(a.list)
     V = ROOT / "validation"
@@ -110,6 +132,9 @@ def main():
     else:
         per = pd.read_csv(V / "centroid_sectors_per_sector.csv.gz")
         stars = pd.read_csv(V / "centroid_sectors_stars.csv.gz")
+    if a.add_dispositions:
+        stars = add_dispositions(L, stars)
+        stars.to_csv(V / "centroid_sectors_stars.csv.gz", index=False)
     x = analyse(L, per, stars, a.floor)
     x.round(4).to_csv(V / "centroid_sectors.csv", index=False)
     t = x[x.n_sectors >= 2]

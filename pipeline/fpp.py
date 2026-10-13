@@ -102,6 +102,15 @@ for attempt in range(4):
 assert target is not None and len(target.pix_coords) == len(sectors), "TESScut downloads incomplete"
 if isinstance(target.trilegal_fname, str):
     target.trilegal_fname = os.path.join(cache_dir, target.trilegal_fname)
+# TIC entries flagged ARTIFACT (spurious 2MASS sources) or DUPLICATE are not stars and should be ignored (Paegert et al.
+# 2021); SPLIT entries are real. Drop them, with their pixel positions (TRICERATOPS's remove_star keeps the positions,
+# which misaligns them), before the aperture fluxes are computed.
+phantom = np.array(target.stars["disposition"].isin(["ARTIFACT", "DUPLICATE"]), dtype=bool)   # writable copy
+phantom[0] = False
+if phantom.any():
+    print("dropped TIC artifacts/duplicates:", ", ".join(target.stars["ID"][phantom].astype(str)))
+    target.stars = target.stars[~phantom].reset_index(drop=True)
+    target.pix_coords = [pc[~phantom] for pc in target.pix_coords]
 aps = []
 for i, s in enumerate(sectors):
     c = np.round(target.pix_coords[i][0]).astype(int)
