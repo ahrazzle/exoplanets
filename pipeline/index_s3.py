@@ -1,7 +1,7 @@
 """Light-curve index for millions of stars without MAST queries: lists the SPOC 2-min, TESS-SPOC
 and QLP products on the STScI open-data bucket, and reads MAST's per-sector bulk-download scripts
 for the HLSP sectors the bucket does not have yet. Keeps one product per star and sector
-(SPOC 2-min, then TESS-SPOC, then QLP), in the manifest format download.py reads.
+(SPOC 2-min, then TESS-SPOC, then QLP; the highest version of a product), in the manifest format download.py reads.
 
 Usage: python index_s3.py TARGETS.parquet --out MANIFEST.parquet [--procs N]
 Run inside AWS us-east-1 (anonymous S3 access; ~10^8 keys are listed). Listing responses are
@@ -25,9 +25,12 @@ from common import PROV_RANK
 BUCKET = "stpubdata"
 SCRIPTS = {"QLP": "https://archive.stsci.edu/hlsps/qlp/download_scripts/",
            "TESS-SPOC": "https://archive.stsci.edu/hlsps/tess-spoc/download_scripts/"}
-TIC_RE = {"QLP": re.compile(r"_s(\d{4})-(\d{16})_tess_v01_llc\.fits$"),
+# QLP products are re-delivered under a new version (v02 for Sectors 74-79); any version is accepted.
+TIC_RE = {"QLP": re.compile(r"_s(\d{4})-(\d{16})_tess_v\d{2}_llc\.fits$"),
           "TESS-SPOC": re.compile(r"_phot_(\d{16})-s(\d{4})_tess_v1_lc\.fits$"),
           "SPOC": re.compile(r"-s(\d{4})-(\d{16})-\d{4}-s_lc\.fits$")}
+SCRIPT_RE = {"QLP": re.compile(r'href="(hlsp_qlp_tess_ffi_s(\d{4})_tess_v\d{2}_llc-fits\.sh)"'),
+             "TESS-SPOC": re.compile(r'href="(hlsp_tess-spoc_tess_phot_s(\d{4})_tess_v1_dl-lc\.sh)"')}
 _s3 = None
 _want = np.zeros(0, np.int64)       # sorted target TIC IDs (a Python set of millions costs ~0.4 GB per process)
 
@@ -67,6 +70,19 @@ def parse(prov, key):
     return (int(b), int(a)) if prov != "TESS-SPOC" else (int(a), int(b))   # (tic, sector)
 
 
+def version(key):
+    """Product version from a QLP file name (`_tess_v02_llc`); 0 for names without one."""
+    m = re.search(r"_tess_v(\d{2})_llc", key)
+    return int(m.group(1)) if m else 0
+
+
+def dedupe(m):
+    """One product per star and sector: SPOC 2-min, then TESS-SPOC, then QLP; within a source, the highest version."""
+    m = m.assign(rank=m["prov"].map(PROV_RANK), version=m["uri"].map(version))
+    m = m.sort_values(["tic", "sector", "rank", "version"], ascending=[True, True, True, False])
+    return m.drop_duplicates(["tic", "sector"]).drop(columns=["rank", "version"])
+
+
 def uri(prov, key):
     if prov == "SPOC":
         return "mast:TESS/product/" + key.rsplit("/", 1)[1]
@@ -99,10 +115,8 @@ def sectors_on_bucket(prov):
 def script_rows(prov, sectors_have, want):
     """Products in MAST bulk-download scripts for sectors missing from the bucket."""
     html = requests.get(SCRIPTS[prov], timeout=60).text
-    pat = r'href="(hlsp_qlp_tess_ffi_s(\d{4})_tess_v01_llc-fits\.sh)"' if prov == "QLP" else \
-          r'href="(hlsp_tess-spoc_tess_phot_s(\d{4})_tess_v1_dl-lc\.sh)"'
     rows = []
-    for name, s in sorted(set(re.findall(pat, html))):
+    for name, s in sorted(set(SCRIPT_RE[prov].findall(html))):
         if int(s) in sectors_have or int(s) > 200:
             continue
         txt = requests.get(SCRIPTS[prov] + name, timeout=600).text
@@ -138,8 +152,7 @@ def main():
         if prov in SCRIPTS:
             rows += script_rows(prov, set(have), want)
     m = pd.DataFrame(rows, columns=["tic", "sector", "prov", "uri"])
-    m["rank"] = m["prov"].map(PROV_RANK)
-    m = m.sort_values(["tic", "sector", "rank"]).drop_duplicates(["tic", "sector"]).drop(columns="rank")
+    m = dedupe(m)
     m["exptime"] = np.where(m["prov"] == "SPOC", 120.0,
                             np.where(m["sector"] <= 26, 1800.0, np.where(m["sector"] <= 55, 600.0, 200.0)))
     m = m[["tic", "prov", "sector", "exptime", "uri"]].reset_index(drop=True)
