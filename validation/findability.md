@@ -25,7 +25,10 @@ over its error). This ignores how fewer sectors would change the detrending and 
 | Sector 83 | September 2024 | 345 (79%) |
 | Sector 96, end of the second extended mission | September 2025 | 407 (93%) |
 
-Only 24 needed Sectors 97–104. The other 7 come out at SNR 8.9–9.0 by this measure even with every sector; the search's
+Only 24 needed Sectors 97–104, but this understates what the newest sectors contribute: the light curves used
+here lacked many QLP products from Sectors 94–97 and 101–104 (24–82% in the earlier searches), which our reader
+dropped because their
+uncertainty columns are empty (found on 13 October; PR #6). The other 7 come out at SNR 8.9–9.0 by this measure even with every sector; the search's
 threshold used the SNR of its period search, which is slightly higher.
 
 ## The signals are weak in any one sector

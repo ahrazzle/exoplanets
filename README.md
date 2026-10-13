@@ -5,6 +5,17 @@ the newest TESS sectors (97–105) with every earlier sector of 9,979 nearby K a
 second, added on 8 October 2026, looks for additional planets around the hosts of 6,430 TESS
 Objects of Interest (TOIs) after masking the known TOIs.
 
+- **Tier L1 re-selected, and a data gap found (13 October 2026): 533 candidates.** An outside contributor showed
+  that the false-alarm classifier's validation let signals from the same star appear in training and evaluation
+  (PR #4, merged). With validation grouped by star, 8 tier L1 candidates fall below the 0.80 score cut and leave; 11
+  signals that now reach it pass the L1 checks (TRICERATOPS with Gaia limits, per-sector centroids) and join:
+  473 full-sky candidates and 60 from the earlier searches
+  ([details](validation/false_alarm_classifier.md#re-selection-of-tier-l1-13-october-2026)). The same contributor
+  found that our reader dropped QLP light curves whose uncertainty column is empty (PR #6, merged). In the earlier
+  searches that removed 24–82% of the QLP light curves in Sectors 94–97 and 101–104, and we estimate about 900,000
+  such light curves were missing from the full-sky search; a re-search of the affected stars is planned. Separately, MAST reports a QLP timing error from the second
+  half of Sector 99 to Sector 104 whose corrected files are not yet delivered; fits that use those sectors may shift by
+  minutes.
 - **TIC artifacts removed (13 October 2026): 530 candidates.** Our neighbour checks and TRICERATOPS had counted TIC
   entries that are not stars (flagged ARTIFACT or DUPLICATE; Paegert et al. 2021). Without them, 7 tier N candidates
   have no neighbour within 15″ and become tier B, and two earlier-search signals set aside only for such an entry are
@@ -463,15 +474,15 @@ candidates reject their target at p < 0.001: 16, which a nearby star fits, becom
 2 go to tier C. 13 more, at p < 0.01, stay counted with `centroid_flag` set. Details:
 [`validation/centroid_sectors.md`](validation/centroid_sectors.md).
 
-| Tier | Full-sky first release | Second release | With Gaia limits (11 October) | Centroids in every sector (12 October) | Without TIC artifacts (13 October) |
-|---|---|---|---|---|---|
-| A (several candidates on the star) | 19 | 11 | 11 | 11 | 11 |
-| B (single) | 381 | 252 | 254 | 250 | 257 |
-| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 | 173 | 159 | 152 |
-| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 | 50 | 50 | 50 |
-| C (grazing, RUWE > 1.4, MES < 10, TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1, or a centroid offset in all sectors; not counted) | 184 | 456 | 455 | 457 | 457 |
-| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 | 56 | 56 | 56 |
-| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 | 1,427 | 1,443 | 1,443 |
+| Tier | Full-sky first release | Second release | With Gaia limits (11 October) | Centroids in every sector (12 October) | Without TIC artifacts (13 October) | L1 re-selected (13 October) |
+|---|---|---|---|---|---|---|
+| A (several candidates on the star) | 19 | 11 | 11 | 11 | 11 | 11 |
+| B (single) | 381 | 252 | 254 | 250 | 257 | 257 |
+| N (neighbour within 15″; TRICERATOPS and centroid) | – | 169 | 173 | 159 | 152 | 152 |
+| L1 (SNR 7.5–9 selected by the false-alarm classifier; TRICERATOPS) | – | 51 | 50 | 50 | 50 | 53 |
+| C (grazing, RUWE > 1.4, MES < 10, TRICERATOPS FPP ≥ 0.5 or NFPP ≥ 0.1, or a centroid offset in all sectors; not counted) | 184 | 456 | 455 | 457 | 457 | 457 |
+| L (SNR 7.5–9, MES ≥ 9; not counted) | – | 56 | 56 | 56 | 56 | 59 |
+| likely binary, likely nearby false positive, likely false alarm, reported elsewhere | 142 | 1,431 | 1,427 | 1,443 | 1,443 | 1,437 |
 
 All 2,426 signals, with fits, centroids, binary checks and TRICERATOPS results where computed, are in
 [`results_public/candidates_allsky.csv`](results_public/candidates_allsky.csv) (column `set`: SNR ≥ 9,
@@ -481,8 +492,8 @@ SNR 7.5–9, or neighbour within 15″); tiers A, B, C, N, L1 and L have folders
 ### Predicted transit times
 
 [`candidates/ephemerides.csv`](candidates/ephemerides.csv) gives the ephemeris of each registered
-candidate, with coordinates, the next transit, and the TESS sectors planned for the star. There are 555:
-the 543 counted on 10 October, 10 that joined on 11 October and 2 on 13 October (column `registered`); 530 are
+candidate, with coordinates, the next transit, and the TESS sectors planned for the star. There are 566:
+the 543 counted on 10 October, 10 that joined on 11 October and 13 on 13 October (column `registered`); 533 are
 counted now. The
 files are append-only. Candidates that leave the counted tiers keep their rows, with their current tier.
 [`candidates/predictions.csv`](candidates/predictions.csv)

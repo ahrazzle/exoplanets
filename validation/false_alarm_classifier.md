@@ -112,3 +112,25 @@ subset. This reflects changed fold assignments and training, not individual fals
 catalog retiering. The pooled inv2 retention changes from 5/268 to 3/268; clean-conditioned retention
 remains 0/35. Both runs score all 14,486 rows. These results used numpy 2.5.3, pandas 2.3.3, scipy 1.18.1
 and scikit-learn 1.9.1. Six regression tests passed.
+
+## Re-selection of tier L1 (13 October 2026)
+
+Tier L1 now uses the star-grouped hold-out scores
+([`false_alarm_classifier_scores_star.csv.gz`](false_alarm_classifier_scores_star.csv.gz), `--split star`); the
+released scores stay in [`false_alarm_classifier_scores.csv.gz`](false_alarm_classifier_scores.csv.gz). The catalog's
+`fa_score` column is now the star-grouped out-of-fold score, which changes the low-score flag (`fa_flag`) from 34 to
+33 counted candidates.
+
+At the 0.80 cut, 70 clean SNR 7.5–9 signals are selected instead of 69. Eight tier L1 candidates fall below it and
+leave: TIC 268436976, 458482761, 233948407 and 346744851 go to tier L (MES ≥ 9), and TIC 407505256, 90956394,
+307983022 and 270355278 to likely false alarm. Of the 15 signals that now reach the cut, 3 are grazing (b ≥ 0.9) and
+keep their tiers. The other 12 got TRICERATOPS runs (default and with the Gaia limits) and per-sector centroids:
+11 pass and join tier L1 (TIC 14598932, 33174398, 71214705, 124382169, 170655214, 199572650, 219694586, 236383404,
+308026772, 422443793 and 432163050; TIC 71214705 carries the centroid flag, p = 0.009), and TIC 34228880 stays in
+tier L with NFPP 0.12. Tier L1 now has 53 candidates.
+
+These signals were measured with the light curves of the release, which lacked many QLP products from Sectors 94–97
+and 101–104 (PR #6). An independent analysis submitted as PR #7, not yet reviewed, reports that the eight leaving candidates other than
+TIC 90956394 keep consistent dips, and that TIC 90956394's restored Sector 94 data allow a 13.3 d period (twice the
+catalog's), which would point to an eclipsing binary.
+
