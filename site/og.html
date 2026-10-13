@@ -1,0 +1,90 @@
+<!doctype html>
+<!-- Source of the share image og.png (1200 x 630). Not deployed: build.sh skips this file.
+     To regenerate: run site/build.sh, copy this file into _site/, serve _site, then
+     "Google Chrome" --headless=new --window-size=1200,630 --virtual-time-budget=8000 --screenshot=site/og.png http://localhost:PORT/og.html
+     The count is read from the CSV files when the image is rendered, and dated. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Share image</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { background: radial-gradient(900px 500px at 78% 10%, rgba(40, 62, 120, 0.45), transparent 70%), #04060c; }
+  #sky, #art { position: absolute; inset: 0; width: 1200px; height: 630px; }
+  .card { position: absolute; left: 70px; top: 64px; width: 640px; }
+  .eye { font: 15px/1.4 var(--mono); letter-spacing: 0.24em; color: var(--cool); text-transform: uppercase; }
+  h1 { font: 500 62px/1.06 var(--serif); color: var(--ink); margin: 22px 0 26px; letter-spacing: -0.01em; }
+  h1 em { color: var(--amber-hi); }
+  .tag { font-size: 14px; padding: 7px 11px; }
+  .num { margin-top: 30px; font: 21px/1.4 var(--serif); color: var(--ink2); }
+  .num b { font: 400 46px/1 var(--serif); color: var(--amber-hi); margin-right: 10px; vertical-align: -6px; }
+  .foot { position: absolute; left: 70px; bottom: 44px; font: 15px/1 var(--mono); letter-spacing: 0.12em; color: var(--dim); }
+  .foot span { color: var(--ink2); }
+  .frame::before, .frame::after { content: ""; position: absolute; width: 22px; height: 22px; border: 1.5px solid var(--amber); opacity: 0.8; }
+  .frame::before { left: 28px; top: 28px; border-right: 0; border-bottom: 0; }
+  .frame::after { right: 28px; bottom: 28px; border-left: 0; border-top: 0; }
+</style>
+</head>
+<body>
+<canvas id="sky" width="1200" height="630"></canvas>
+<canvas id="art" width="1200" height="630"></canvas>
+<div class="frame"></div>
+<div class="card">
+  <div class="eye">Independent TESS transit searches</div>
+  <h1>Faint transits in light <em>TESS had already recorded</em></h1>
+  <span class="tag t-cand">Candidates &middot; not confirmed</span>
+  <div class="num"><b id="n">&hellip;</b><span id="nl">counted transit candidates</span></div>
+</div>
+<div class="foot"><span>Eumemic</span> &nbsp;&middot;&nbsp; eumemic.github.io/exoplanets</div>
+<script src="common.js"></script>
+<script>
+(function () {
+  var X = window.Exo, TAU = Math.PI * 2;
+  // background: the registered candidate hosts at their sky positions
+  X.fetchText('data/ephemerides.csv').then(function (t) {
+    var c = document.getElementById('sky').getContext('2d');
+    X.parseCSVObjects(t).forEach(function (r) {
+      var x = (360 - +r.ra) / 360 * 1200, y = (90 - +r.dec) / 180 * 630, m = +r.Tmag || 12;
+      var rad = Math.max(0.6, 2.1 - (m - 7.5) * 0.24), a = Math.max(0.25, Math.min(0.9, 1.05 - (m - 7.5) * 0.11));
+      c.fillStyle = 'rgba(255,236,206,' + a + ')'; c.beginPath(); c.arc(x, y, rad, 0, TAU); c.fill();
+    });
+  });
+  // a star with a planet in transit, and the dip it makes
+  var c = document.getElementById('art').getContext('2d');
+  var cx = 1010, cy = 250, R = 150;
+  var g = c.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 2.2);
+  g.addColorStop(0, 'rgba(255,170,90,0.22)'); g.addColorStop(1, 'rgba(255,170,90,0)');
+  c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 2.2, 0, TAU); c.fill();
+  var gd = c.createRadialGradient(cx, cy, 0, cx, cy, R);
+  for (var i = 0; i <= 12; i++) { var r = i / 12, mu = Math.sqrt(Math.max(0, 1 - r * r)), f = 1 - 0.5 * (1 - mu) - 0.2 * (1 - mu) * (1 - mu);
+    gd.addColorStop(r, 'rgb(' + Math.round(255 * Math.min(1, 0.35 + 0.68 * f)) + ',' + Math.round(222 * f + 18) + ',' + Math.round(170 * f * f + 30) + ')'); }
+  c.fillStyle = gd; c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.fill();
+  c.fillStyle = '#05070d'; c.beginPath(); c.arc(cx - 40, cy + 0.75 * R * 0.6, 9, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(142,197,230,0.9)'; c.lineWidth = 1.2; c.beginPath(); c.arc(cx - 40, cy + 0.75 * R * 0.6, 10, 0, TAU); c.stroke();
+  // light curve along the bottom right
+  var x0 = 760, x1 = 1170, base = 500, d = 46;
+  c.strokeStyle = 'rgba(164,182,222,0.18)'; c.lineWidth = 1; c.setLineDash([3, 5]);
+  c.beginPath(); c.moveTo(x0, base + d); c.lineTo(x1, base + d); c.stroke(); c.setLineDash([]);
+  c.strokeStyle = '#ffd9a0'; c.lineWidth = 2.6; c.shadowColor = 'rgba(240,178,90,0.7)'; c.shadowBlur = 12;
+  c.beginPath();
+  for (var x = x0; x <= x1; x += 2) {
+    var u = (x - (x0 + x1) / 2) / 70, y;
+    if (Math.abs(u) >= 1) y = 0; else if (Math.abs(u) > 0.72) y = d * (1 - Math.abs(u)) / 0.28; else y = d * (1 - 0.12 * u * u);
+    if (x === x0) c.moveTo(x, base + y); else c.lineTo(x, base + y);
+  }
+  c.stroke(); c.shadowBlur = 0;
+  c.font = '13px ui-monospace, Menlo, monospace'; c.fillStyle = '#939cb0'; c.textAlign = 'right';
+  c.fillText('DEPTH ≈ (Rp/R*)²', x1, base + d + 26);
+  // the count, from the tables
+  X.loadCandidates().then(function (rows) {
+    var n = rows.filter(function (r) { return X.isCountedTier(r.tier); });
+    var stars = new Set(n.map(function (r) { return r.tic; })).size;
+    document.getElementById('n').textContent = n.length.toLocaleString('en-US');
+    document.getElementById('nl').textContent = 'counted candidates on ' + stars.toLocaleString('en-US') + ' stars, ' +
+      new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  });
+})();
+</script>
+</body>
+</html>

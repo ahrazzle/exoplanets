@@ -19,6 +19,8 @@
     earlier:   { site: 'data/tiers_earlier_candidates.csv', repo: 'results_public/tiers_earlier_candidates.csv' },
     ephem:     { site: 'data/ephemerides.csv',              repo: 'candidates/ephemerides.csv' },
     preds:     { site: 'data/predictions.csv',              repo: 'candidates/predictions.csv' },
+    findability: { site: 'data/findability.csv',          repo: 'validation/findability.csv' },
+    upcoming:  { site: 'data/upcoming.json' },
     folders:   { site: 'data/folders.json' },
     build:     { site: 'data/build.json' }
   };
@@ -37,6 +39,14 @@
     { id: 'likely false alarm', counted: false, name: 'Likely false alarm', text: 'Likely false alarm. Not counted.' },
     { id: 'reported', counted: false, name: 'Reported elsewhere', text: 'Reported elsewhere. Not counted.' }
   ];
+  /* Colour and marker shape per counted tier. Four hues cannot all be told apart under colour-vision
+   * deficiency in a scatter, so every chart also encodes the tier by shape. */
+  var TIER_STYLE = {
+    A:  { color: '#e0a23a', shape: 'circle',   label: 'A' },
+    B:  { color: '#4a90e2', shape: 'square',   label: 'B' },
+    N:  { color: '#d8638f', shape: 'triangle', label: 'N' },
+    L1: { color: '#25ad7e', shape: 'diamond',  label: 'L1' }
+  };
   var TIER_BY_ID = {};
   TIERS.forEach(function (t) { TIER_BY_ID[t.id] = t; });
   function isCountedTier(id) { return !!(TIER_BY_ID[id] && TIER_BY_ID[id].counted); }
@@ -173,6 +183,11 @@
       var e = nearestByPeriod(eMap, r.tic, r.P, 0.002, 0);
       if (e) { r.T14 = num(e.duration_h); r.depth = num(e.depth_ppm); r.Tmag = num(e.Tmag); }
     });
+    // Sky position and registration date, from the ephemeris table (registered candidates only).
+    full.concat(earlier).forEach(function (r) {
+      var e = nearestByPeriod(eMap, r.tic, r.P, 0.002, 0);
+      r.ra = e ? num(e.ra) : NaN; r.dec = e ? num(e.dec) : NaN; r.registered = e ? e.registered : '';
+    });
     var fi = folderIndex();
     var fiEarlier = folderIndex();
     if (folders) {
@@ -226,16 +241,22 @@
     var m = v.length >> 1;
     return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
   }
+  /* Small inline marker matching the charts: colour and shape per counted tier, a hollow ring otherwise. */
   function tierDot(id) {
-    var cls = (id === 'A' || id === 'B' || id === 'N' || id === 'L1') ? id : '';
-    return '<span class="tier-dot ' + cls + '" aria-hidden="true"></span>';
+    var st = TIER_STYLE[id], d;
+    if (!st) return '<svg class="tier-dot" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="3.6" fill="none" stroke="#8e97ab" stroke-width="1.3"/></svg>';
+    if (st.shape === 'circle') d = '<circle cx="6" cy="6" r="4.4"/>';
+    else if (st.shape === 'square') d = '<rect x="2" y="2" width="8" height="8" rx="1"/>';
+    else if (st.shape === 'triangle') d = '<path d="M6 1.2 L10.8 10 H1.2 Z"/>';
+    else d = '<path d="M6 0.8 L11.2 6 L6 11.2 L0.8 6 Z"/>';
+    return '<svg class="tier-dot" viewBox="0 0 12 12" aria-hidden="true" fill="' + st.color + '">' + d + '</svg>';
   }
 
   function renderTierLegend(el, counts) {
     var html = '<dl class="legend">';
     TIERS.forEach(function (t) {
       var c = counts && counts[t.id] !== undefined ? ' <span class="muted">(' + counts[t.id].toLocaleString('en-US') + ' rows)</span>' : '';
-      html += '<dt>' + tierDot(t.id) + esc(t.name) + (t.counted ? ' <span class="tag">counted</span>' : ' <span class="tag">not counted</span>') + c + '</dt><dd>' + esc(t.text) + '</dd>';
+      html += '<dt>' + tierDot(t.id) + esc(t.name) + (t.counted ? ' <span class="tag t-live">counted</span>' : ' <span class="tag">not counted</span>') + c + '</dt><dd>' + esc(t.text) + '</dd>';
     });
     el.innerHTML = html + '</dl>';
   }
@@ -246,7 +267,7 @@
     if (!el) return;
     fetchJSON(DATA.build.site).then(function (b) {
       var link = b.commit ? ' <a href="' + GH.repo + '/commit/' + esc(b.commit) + '">' + esc(String(b.commit).slice(0, 7)) + '</a>' : '';
-      el.innerHTML = 'Site built from commit' + link + ' on ' + esc(b.built || '') + '.';
+      el.innerHTML = 'Built from commit' + link + ' on ' + esc(b.built || '') + '.';
     }).catch(function () { /* optional */ });
   }
   function showError(el, err) {
@@ -254,7 +275,7 @@
   }
 
   var api = {
-    GH: GH, DATA: DATA, TIERS: TIERS, TIER_BY_ID: TIER_BY_ID, isCountedTier: isCountedTier,
+    GH: GH, DATA: DATA, TIERS: TIERS, TIER_STYLE: TIER_STYLE, TIER_BY_ID: TIER_BY_ID, isCountedTier: isCountedTier,
     parseCSV: parseCSV, parseCSVObjects: parseCSVObjects, num: num, firstNum: firstNum,
     buildCandidates: buildCandidates, loadCandidates: loadCandidates, fetchText: fetchText, fetchJSON: fetchJSON,
     groupByTic: groupByTic, nearestByPeriod: nearestByPeriod,

@@ -108,6 +108,8 @@
       return { p: p, t: utcMs(p.tc_UTC), P: P, sigma: X.num(p.sigma_min), dur: X.num(p.duration_h), e: X.nearestByPeriod(eMap, p.TIC, P, 0, 1e-5) };
     });
     $('start').value = todayUTC();
+    var q0 = new URLSearchParams(location.search).get('q');
+    if (q0) $('q').value = q0;
     $('filters').addEventListener('input', applyFilters);
     $('thead').addEventListener('click', function (e) {
       var b = e.target.closest('button[data-key]'); if (!b) return;
@@ -126,7 +128,6 @@
     applyFilters();
   }
 
-  X.fillBuildInfo();
   Promise.all([X.fetchText(X.DATA.preds.site), X.fetchText(X.DATA.ephem.site)])
     .then(function (v) { $('loading').remove(); init(v[0], v[1]); })
     .catch(function (err) { X.showError($('loading'), err); });
