@@ -13,7 +13,7 @@ Objects of Interest (TOIs) after masking the known TOIs.
   ([details](validation/false_alarm_classifier.md#re-selection-of-tier-l1-13-october-2026)). The same contributor
   found that our reader dropped QLP light curves whose uncertainty column is empty (PR #6, merged). In the earlier
   searches that removed 24–82% of the QLP light curves in Sectors 94–97 and 101–104, and we estimate about 900,000
-  such light curves were missing from the full-sky search; a re-search of the affected stars is planned. QLP Sectors 74–79 are also absent from the full-sky index: MAST re-delivered them as version 2 files after correcting a timestamp error, and the index accepted only version 1 file names. Separately, MAST reports a QLP timing error from the second
+  such light curves were missing from the full-sky search; a re-search of the affected stars is planned. Separately, MAST reports a QLP timing error from the second
   half of Sector 99 to Sector 104 whose corrected files are not yet delivered; fits that use those sectors may shift by
   minutes.
 - **TIC artifacts removed (13 October 2026): 530 candidates.** Our neighbour checks and TRICERATOPS had counted TIC
