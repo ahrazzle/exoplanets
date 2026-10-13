@@ -749,6 +749,9 @@ results_public/    all signals, vetted signals, candidate tables, novelty check
 validation/        control-star vetting outputs and the injection-recovery tables
 ```
 
+The columns, units, time conventions and tier labels of the tables in `results_public/` and `candidates/` are
+defined in [`results_public/README.md`](results_public/README.md).
+
 ## Credits
 
 This work uses data from the TESS mission, obtained from MAST at STScI: SPOC light curves
