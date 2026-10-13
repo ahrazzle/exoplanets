@@ -4,6 +4,12 @@ orbits (SB1, SB2, eclipsing, astrometric); the TESS eclipsing-binary catalog (Pr
 APOGEE binaries (Kounkel et al. 2021); and VSX. A binary at the target's position, or an eclipsing
 binary within 60" whose period matches the candidate's (ratios 1/3-3), explains the signal.
 
+TIC positions are epoch J2000 and Gaia DR3 positions (including its eclipsing-binary and non-single-star
+tables) are epoch 2016.0, so the TIC position is moved to 2016.0 with the TIC proper motion before the
+Gaia matches. Without that, a star moving faster than about 190 mas/yr drifts beyond AT_TARGET and has
+no Gaia match (RUWE NaN, Gaia binary flags blind). The other catalogues are matched at the TIC position:
+their epochs are not uniformly known (VSX and the TESS EB catalog mix sources; the APOGEE table gives none).
+
 Usage: python binary_check.py CANDIDATES.csv OUT.csv     (columns TIC and P_d; ra/dec looked up
                                                            in the TIC when missing)
 """
@@ -25,6 +31,8 @@ CATS = {"gaia": ("vizier:I/355/gaiadr3", 5, None, None),
         "gaia_sb2": ("vizier:I/357/tbosb2", 3, "Per", None),
         "gaia_eb_orbit": ("vizier:I/357/tboeb", 3, "Per", None),
         "gaia_orbit": ("vizier:I/357/tbooc", 3, "Per", None)}
+GAIA_CATS = {"gaia", "gaia_eb", "gaia_sb1", "gaia_sb2", "gaia_eb_orbit", "gaia_orbit"}   # Gaia DR3, epoch 2016.0
+TIC_EPOCH, GAIA_EPOCH = 2000.0, 2016.0
 AT_TARGET = 3.0          # arcsec: the same star
 RATIOS = (1 / 3, 1 / 2, 2 / 3, 1, 3 / 2, 2, 3)
 
@@ -35,8 +43,20 @@ def positions(tics):
     rows = []
     for i in range(0, len(tics), 100):
         t = Catalogs.query_criteria(catalog="TIC", ID=[int(x) for x in tics[i:i + 100]])
-        rows += [(int(r["ID"]), float(r["ra"]), float(r["dec"]), float(r["Tmag"])) for r in t]
-    return pd.DataFrame(rows, columns=["TIC", "ra", "dec", "Tmag"])
+        rows += [(int(r["ID"]), float(r["ra"]), float(r["dec"]), float(r["Tmag"]),
+                  float(r["pmRA"]), float(r["pmDEC"])) for r in t]       # pmRA is mu_alpha*cos(dec); masked -> NaN
+    return pd.DataFrame(rows, columns=["TIC", "ra", "dec", "Tmag", "pmRA", "pmDEC"])
+
+
+def propagate(ra, dec, pmra, pmdec, dt_yr):
+    """Move positions (deg) by proper motion (mas/yr; pmra already includes cos(dec)) over dt_yr years.
+    A NaN proper motion leaves the position unchanged."""
+    ra, dec = np.asarray(ra, float), np.asarray(dec, float)
+    pmra = np.nan_to_num(np.asarray(pmra, float))
+    pmdec = np.nan_to_num(np.asarray(pmdec, float))
+    dec_new = dec + pmdec * dt_yr / 3.6e6
+    ra_new = (ra + pmra * dt_yr / 3.6e6 / np.cos(np.radians(dec))) % 360.0
+    return ra_new, dec_new
 
 
 def period_match(p, q, tol=0.005):
@@ -47,14 +67,18 @@ def main():
     from astroquery.xmatch import XMatch
 
     c = pd.read_csv(sys.argv[1])
-    if not {"ra", "dec"} <= set(c.columns):
+    if not {"ra", "dec", "pmRA", "pmDEC"} <= set(c.columns):
+        c = c.drop(columns=[k for k in ("ra", "dec", "pmRA", "pmDEC", "Tmag") if k in c.columns])
         c = c.merge(positions(list(c["TIC"].unique())), on="TIC", how="left")
-    tab = Table.from_pandas(c[["TIC", "ra", "dec"]].drop_duplicates("TIC").reset_index(drop=True))
+    d = c[["TIC", "ra", "dec", "pmRA", "pmDEC"]].drop_duplicates("TIC").reset_index(drop=True)
+    d["ra16"], d["dec16"] = propagate(d["ra"], d["dec"], d["pmRA"], d["pmDEC"], GAIA_EPOCH - TIC_EPOCH)
+    tab = {False: Table.from_pandas(d[["TIC", "ra", "dec"]]),                    # J2000, as in the TIC
+           True: Table.from_pandas(d[["TIC", "ra16", "dec16"]].rename(columns={"ra16": "ra", "dec16": "dec"}))}
     hits = {}
     for name, (cat, rad, pcol, fcol) in CATS.items():
         for attempt in range(4):
             try:
-                r = XMatch.query(cat1=tab, cat2=cat, max_distance=rad * u.arcsec, colRA1="ra", colDec1="dec").to_pandas()
+                r = XMatch.query(cat1=tab[name in GAIA_CATS], cat2=cat, max_distance=rad * u.arcsec, colRA1="ra", colDec1="dec").to_pandas()
                 break
             except Exception as ex:          # the CDS server sometimes drops long requests
                 print(f"{name}: retry after {ex!r:.80}", flush=True)
