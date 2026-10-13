@@ -493,15 +493,15 @@ SNR 7.5–9, or neighbour within 15″); tiers A, B, C, N, L1 and L have folders
 
 [`candidates/ephemerides.csv`](candidates/ephemerides.csv) gives the ephemeris of each registered
 candidate, with coordinates, the next transit, and the TESS sectors planned for the star. There are 566:
-the 543 counted on 10 October, 10 that joined on 11 October and 13 on 13 October (column `registered`); 533 are
+the 543 counted on 10 October, 10 that joined on 12 October and 13 on 13 October (column `registered`); 533 are
 counted now. The
 files are append-only. Candidates that leave the counted tiers keep their rows, with their current tier.
 [`candidates/predictions.csv`](candidates/predictions.csv)
-lists all 36,423 predicted transits from the registration date through June 2027, with the 1σ uncertainty,
+lists all 37,531 predicted transits from the registration date through June 2027, with the 1σ uncertainty,
 the UTC time at Earth's centre, and the TESS sector when the transit falls inside a published TESS
 orbit window and the star is on a detector. The median 1σ uncertainty of the next transit is 12 min.
 Of the 543 registered on 10 October, 62 have 656 transits in the published windows of Sectors 109–111 (through 3 December
-2026), all with 1σ uncertainties shorter than the transit duration, and 343 candidates are on
+2026), all with 1σ uncertainties shorter than the transit duration, and 308 candidates are on
 detectors in sectors planned through Sector 134 (tess-point 0.9.5.post1). These files were
 committed before those data exist: for a planet, each transit should appear at the predicted time
 with the fitted depth.
