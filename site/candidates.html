@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidates | TESS transit candidates</title>
+<meta name="description" content="Sortable, filterable table of the planet candidates from the TESS transit searches, with links to ExoFOP and to each candidate folder.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site"><div class="bar">
+  <a class="brand" href="index.html">TESS transit candidates</a>
+  <nav aria-label="Main"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="candidates.html" aria-current="page">Candidates</a></li>
+    <li><a href="transits.html">Upcoming transits</a></li>
+    <li><a href="methods.html">Methods and validation</a></li>
+    <li><a href="https://github.com/eumemic/exoplanets">Repository</a></li>
+  </ul></nav>
+</div></header>
+<main id="main">
+
+<h1>Candidates</h1>
+<p class="lead">Every row of the repository's full-sky candidate table and of the table of earlier-search candidates. By default only the tiers the README counts as candidates are shown.</p>
+<p class="note">These are planet candidates, not confirmed planets. FPP is the TRICERATOPS false-positive probability from TESS data alone; the table shows the Gaia-limited, centroid-combined value (<code>FPP_gc</code>) where available, then <code>FPP_c</code>, then <code>FPP</code>. The statistical-validation threshold is FPP &lt; 0.015 and also needs high-resolution imaging. The earlier-search table has no T14, depth or Tmag of its own; where the same signal is in the ephemeris table those values are filled in, and T<sub>eff</sub>, distance and MES are left blank.</p>
+
+<div id="loading" aria-live="polite">Loading data&hellip;</div>
+<form class="controls" id="filters" role="search" aria-label="Filter candidates" onsubmit="return false">
+  <div>
+    <label for="q">Search by TIC</label>
+    <input type="search" id="q" placeholder="e.g. 354944123" autocomplete="off">
+  </div>
+  <div>
+    <label for="set">Search set</label>
+    <select id="set"><option value="all">Both</option><option value="full-sky">Full-sky search</option><option value="earlier">Earlier searches</option></select>
+  </div>
+  <fieldset><legend>Counted tiers</legend><div id="tiers-counted" class="inline"></div></fieldset>
+  <fieldset><legend>Not counted as candidates</legend><div id="tiers-other"></div></fieldset>
+  <fieldset><legend>Period (days)</legend><div class="range"><label>min <input type="number" id="pmin" min="0" step="any" inputmode="decimal"></label><label>max <input type="number" id="pmax" min="0" step="any" inputmode="decimal"></label></div></fieldset>
+  <fieldset><legend>Radius (Earth radii)</legend><div class="range"><label>min <input type="number" id="rmin" min="0" step="any" inputmode="decimal"></label><label>max <input type="number" id="rmax" min="0" step="any" inputmode="decimal"></label></div></fieldset>
+  <div><button type="button" class="btn secondary" id="reset">Reset filters</button></div>
+</form>
+
+<div class="toolbar">
+  <span id="count" role="status" aria-live="polite"></span>
+  <span class="grow"></span>
+  <button type="button" class="btn secondary" id="dl-view">Download filtered view (CSV)</button>
+  <a class="btn secondary" href="https://raw.githubusercontent.com/eumemic/exoplanets/main/results_public/candidates_allsky.csv">Full-sky CSV</a>
+  <a class="btn secondary" href="https://raw.githubusercontent.com/eumemic/exoplanets/main/results_public/tiers_earlier_candidates.csv">Earlier-search CSV</a>
+</div>
+<div class="table-wrap" id="table-wrap" tabindex="0" role="region" aria-label="Candidates table, scrollable">
+  <table>
+    <caption class="sr">Planet candidates. Select a column heading to sort.</caption>
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<div class="toolbar">
+  <button type="button" class="btn secondary" id="prev">Previous</button>
+  <span id="page-label"></span>
+  <button type="button" class="btn secondary" id="next">Next</button>
+</div>
+<p class="note">Select a TIC to open its ExoFOP page. &ldquo;folder&rdquo; opens the candidate's folder on GitHub (vetting plot, transit fit, centroid offsets, nearby stars and TRICERATOPS output). T14 is the transit duration. Flags are the catalog's <code>centroid_flag</code>, <code>c_reason</code>, <code>fa_flag</code>, <code>desert_flag</code> and variable or binary <code>rv_flag</code> values.</p>
+
+<h2 id="legend-heading">Tier legend</h2>
+<p class="note">As described in the <a href="https://github.com/eumemic/exoplanets#full-sky-search-8-october-2026">README</a>. &ldquo;Rows&rdquo; counts rows in the two tables, not unique stars.</p>
+<div id="legend"></div>
+
+</main>
+
+<footer class="site"><div class="bar">
+  <p>Data and code from <a href="https://github.com/eumemic/exoplanets">github.com/eumemic/exoplanets</a>. Code is MIT; results, tables and figures are CC BY 4.0 (see <a href="https://github.com/eumemic/exoplanets/blob/main/LICENSE">LICENSE</a>). This site is a view of the repository's tables; the repository is authoritative.</p>
+  <p id="build-info"></p>
+</div></footer>
+<script src="common.js"></script>
+<script src="candidates.js"></script>
+</body>
+</html>

@@ -749,6 +749,8 @@ results_public/    all signals, vetted signals, candidate tables, novelty check
 validation/        control-star vetting outputs and the injection-recovery tables
 ```
 
+Website: <https://eumemic.github.io/exoplanets/> (built from `site/` by `.github/workflows/pages.yml`; it reads the tables above).
+
 ## Credits
 
 This work uses data from the TESS mission, obtained from MAST at STScI: SPOC light curves
