@@ -71,6 +71,7 @@ def do_star(tic, rows):
         k = f"s{int(r.sector)}_"
         for name in ("time", "flux", "flux_err", "cx", "cy", "bkg"):
             arrays[k + name] = d[name]
+        arrays[k + "flux_err_source"] = np.array(d.get("flux_err_source", "unknown"))
         arrays[k + "prov"] = np.array(r.prov)
         arrays[k + "exptime"] = np.array(d["exptime"])
         sectors.append(int(r.sector))

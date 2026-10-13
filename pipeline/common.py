@@ -71,13 +71,39 @@ def read_tglc(h):
     err = 1.4826 * np.nanmedian(np.abs(np.diff(fn) - np.nanmedian(np.diff(fn)))) / np.sqrt(2) if good.sum() > 2 else np.nan
     zeros = np.zeros(good.sum(), np.float32)
     return dict(time=t[good], flux=fn.astype(np.float32), flux_err=np.full(good.sum(), err, np.float32),
+                flux_err_source="tglc_point_to_point_mad",
                 cx=zeros, cy=zeros, bkg=np.asarray(d["background"], float)[good].astype(np.float32),
                 camera=int(h[0].header.get("CAMERA", -1) or -1), ccd=int(h[0].header.get("CCD", -1) or -1),
                 exptime=float(np.nanmedian(np.diff(t[good]))) * 86400.0 if good.sum() > 2 else np.nan)
 
 
+def qlp_point_to_point_error(t, f):
+    """Robust raw-flux scatter; require >=3 short-gap differences and positive scatter.
+
+    Sort eligible cadences and exclude separations above three times their median positive
+    spacing. This is an empirical white-noise approximation, not a calibrated flux error.
+    """
+    if len(t) < 4:
+        return np.nan
+    order = np.argsort(t)
+    dt = np.diff(t[order])
+    positive = dt[dt > 0]
+    if not len(positive):
+        return np.nan
+    adjacent = (dt > 0) & (dt <= 3 * np.median(positive))
+    df = np.diff(f[order])[adjacent]
+    if len(df) < 3:
+        return np.nan
+    err = 1.4826 * np.median(np.abs(df - np.median(df))) / np.sqrt(2)
+    return err if np.isfinite(err) and err > 0 else np.nan
+
+
 def read_lc_fits(path, provenance):
-    """Return dict of clean arrays from a SPOC/TESS-SPOC/QLP/TGLC light-curve FITS."""
+    """Return clean arrays and `flux_err_source` from a light-curve FITS.
+
+    QLP alone may use point-to-point scatter when no eligible cadence has a finite,
+    positive selected error. Partially valid uncertainty columns keep the original mask.
+    """
     from astropy.io import fits
 
     with fits.open(path, memmap=False) as h:
@@ -91,6 +117,7 @@ def read_lc_fits(path, provenance):
         if provenance in ("SPOC", "TESS-SPOC"):
             f = np.asarray(d["PDCSAP_FLUX"], float)
             e = np.asarray(d["PDCSAP_FLUX_ERR"], float)
+            error_source = "PDCSAP_FLUX_ERR"
             bad = (q & SPOC_BAD_BITS) != 0
             cx = np.asarray(d["MOM_CENTR1"], float)
             cy = np.asarray(d["MOM_CENTR2"], float)
@@ -100,16 +127,29 @@ def read_lc_fits(path, provenance):
             ecol = "DET_FLUX_ERR" if "DET_FLUX_ERR" in cols else "KSPSAP_FLUX_ERR"
             f = np.asarray(d[fcol], float)
             e = np.asarray(d[ecol], float)
+            error_source = ecol
             bad = (q & QLP_BAD_BITS) != 0
             cx = np.asarray(d["SAP_X"], float)
             cy = np.asarray(d["SAP_Y"], float)
             bkg = np.asarray(d["SAP_BKG"], float)
-        good = ~bad & np.isfinite(t) & np.isfinite(f) & np.isfinite(e) & (e > 0)
+        eligible = ~bad & np.isfinite(t) & np.isfinite(f)
+        valid_error = np.isfinite(e) & (e > 0)
+        if provenance == "QLP" and eligible.any() and not (eligible & valid_error).any():
+            med = np.median(f[eligible])
+            err = qlp_point_to_point_error(t[eligible], f[eligible])
+            if np.isfinite(med) and med > 0 and np.isfinite(err):
+                e = np.full(len(e), err)
+                valid_error = np.isfinite(e) & (e > 0)
+                error_source = "qlp_point_to_point_mad"
+            else:
+                error_source = "qlp_point_to_point_unavailable"
+        good = eligible & valid_error
         med = np.nanmedian(f[good]) if good.any() else np.nan
         out = dict(
             time=t[good],
             flux=(f[good] / med).astype(np.float32),
             flux_err=(e[good] / med).astype(np.float32),
+            flux_err_source=error_source,
             cx=cx[good].astype(np.float32),
             cy=cy[good].astype(np.float32),
             bkg=bkg[good].astype(np.float32),
@@ -132,6 +172,7 @@ def load_star(tic: int):
                         provenance=str(z[k + "prov"]),
                         time=z[k + "time"], flux=z[k + "flux"].astype(float),
                         flux_err=z[k + "flux_err"].astype(float),
+                        flux_err_source=str(z[k + "flux_err_source"]) if k + "flux_err_source" in z else "unknown",
                         cx=z[k + "cx"], cy=z[k + "cy"], bkg=z[k + "bkg"],
                         exptime=float(z[k + "exptime"])))
     return out
