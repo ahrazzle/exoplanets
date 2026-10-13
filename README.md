@@ -705,7 +705,7 @@ EXO_DATA_SOURCE=s3 ../.venv/bin/python fpp_batch.py list.csv --stars stars.parqu
 EXO_INVERT=1 ../.venv/bin/python run_shard.py sample.parquet manifest.parquet --shard 0 --nshards 1 \
     --out ../results/search_inv_allsky --keep-snr 7.5
 ../.venv/bin/python fa_classifier.py ../validation/false_alarm_classifier_table.csv.gz \
-    --stars-real 4039203 --stars-inv 399408 399361     # false-alarm classifier (tier L1)
+    --stars-real 4039203 --stars-inv 399408 399361 --split signal  # released classifier; legacy signal split
 # Gaia limits on companions (11 October): MOLUSC per star, then default and constrained TRICERATOPS runs
 ../.venv/bin/python molusc_batch.py stars.parquet --gaia gaia_dr3.csv --molusc MOLUSC/code --out ../results/molusc
 EXO_DATA_SOURCE=s3 ../.venv/bin/python fpp_batch.py list.csv --stars stars.parquet --out ../results/fpp_m \
