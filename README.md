@@ -5,8 +5,6 @@ the newest TESS sectors (97–105) with every earlier sector of 9,979 nearby K a
 second, added on 8 October 2026, looks for additional planets around the hosts of 6,430 TESS
 Objects of Interest (TOIs) after masking the known TOIs.
 
-Website: <https://eumemic.github.io/exoplanets/> (built from `site/` by `.github/workflows/pages.yml`; it reads the tables in this repository).
-
 - **Tier L1 re-selected, and a data gap found (13 October 2026): 533 candidates.** An outside contributor showed
   that the false-alarm classifier's validation let signals from the same star appear in training and evaluation
   (PR #4, merged). With validation grouped by star, 8 tier L1 candidates fall below the 0.80 score cut and leave; 11
