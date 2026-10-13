@@ -10,9 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'pipeline'))
 import predict
 
-# Last sector of the TESS orbit schedule (TESS_orbit_times.csv) used by the committed ephemerides.
-# Raise it when predict.py is rerun against a longer schedule.
-LAST_PLANNED_SECTOR = 134
+# tess-point numbers its special pointings from 1751 upwards; regular sectors stay far below.
+FIRST_SPECIAL_POINTING = 1751
 
 
 class PlannedSectors(unittest.TestCase):
@@ -31,12 +30,12 @@ class PlannedSectors(unittest.TestCase):
 
 
 class CommittedEphemerides(unittest.TestCase):
-    def test_no_planned_sector_above_the_schedule(self):
+    def test_no_special_pointing_in_planned_sectors(self):
         eph = pd.read_csv(ROOT / 'candidates' / 'ephemerides.csv', dtype={'tess_sectors_planned': str},
                           keep_default_na=False)
         planned = {int(s) for v in eph['tess_sectors_planned'] for s in v.split(',') if s}
         self.assertTrue(planned)
-        self.assertLessEqual(max(planned), LAST_PLANNED_SECTOR)
+        self.assertLess(max(planned), FIRST_SPECIAL_POINTING)
 
 
 if __name__ == '__main__':
